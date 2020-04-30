@@ -1,0 +1,359 @@
+\begin{thebibliography}{0} 
+\bibitem{meyers_extreme_2011}
+  \Editor{Meyers, Robert A.}
+  \Book{Extreme {Environmental} {Events}}
+  \Publ{Springer New York}
+  \Year{2011}
+\bibitem{siriki_laboratory_2015}
+  \Name{Siriki H., Bhat H. S., Lu X. and Krishnan S.}
+  \Review{Bull. Seismol. Soc. Am.}
+  \Vol{105}
+  \Year{2015}
+  \Page{2250--2273}
+\bibitem{selvam_universal_2000}
+  \Name{Selvam A. M.}
+  \Review{arXiv:physics/0008010}
+  \Year{2000}
+\bibitem{cattani_deterministic_2017}
+  \Name{Cattani M., Caldas I. L., Souza S. L., Iarosz K. C., Cattani M., Caldas I. L., Souza S. L. and Iarosz K. C.}
+  \Review{Revista Brasileira de Ensino de F\'{i}sica}
+  \Vol{39}
+  \Year{2017}
+\bibitem{cecconi_brownian_2005}
+  \Name{Cecconi F., Cencini M., Falcioni M. and Vulpiani A.}
+  \Review{Chaos: An Interdisciplinary Journal of Nonlinear Science}
+  \Vol{15}
+  \Year{2005}
+  \Page{026102}
+\bibitem{eckmann_roads_1981}
+  \Name{Eckmann J. -P.}
+  \Review{Rev. Mod. Phys.}
+  \Vol{53}
+  \Year{1981}
+  \Page{643--654}
+\bibitem{rundle_statistical_2003}
+  \Name{Rundle J. B., Turcotte D. L., Shcherbakov R., Klein W. and Sammis C.}
+  \Review{Rev. Geophys.}
+  \Vol{41}
+  \Year{2003}
+  \Page{1019}
+\bibitem{lemons_paul_1997}
+  \Name{Lemons D. S. and Gythiel A.}
+  \Review{Am. J. Phys}
+  \Vol{65}
+  \Year{1997}
+  \Page{1079--1081}
+\bibitem{renn_einsteins_2005}
+  \Name{Renn J.}
+  \Review{Ann. Phys.}
+  \Vol{14}
+  \Year{2005}
+  \Page{23--37}
+\bibitem{yulmetyev_study_2009}
+  \Name{Yulmetyev R., Khusnutdinoff R., Tezel T., Iravul Y., Tuzel B. and H\"anggi P.}
+  \Review{Physica A}
+  \Vol{388}
+  \Year{2009}
+  \Page{3629--3635}
+\bibitem{eslamizadeh_statistical_2018}
+  \Name{Eslamizadeh H. and Razazzadeh H.}
+  \Review{Phys. Lett. B}
+  \Vol{777}
+  \Year{2018}
+  \Page{265--269}
+\bibitem{aviles_fractal_1987}
+  \Name{Aviles C. A., Scholz C. H. and Boatwright J.}
+  \Review{Journal of Geophysical Research: Solid Earth}
+  \Vol{92}
+  \Year{1987}
+  \Page{331--344}
+\bibitem{hirata_fractal_1989}
+  \Name{Hirata T.}
+  \Review{Pure Appl. Geophys.}
+  \Vol{131}
+  \Year{1989}
+  \Page{157--170}
+\bibitem{sunmonu_fractal_2000}
+  \Name{Sunmonu L. A. and Dimri V. P.}
+  \Review{Pure Appl. Geophys.}
+  \Vol{157}
+  \Year{2000}
+  \Page{1393--1405}
+\bibitem{velde_fractal_1991}
+  \Name{Velde B., Dubois J., Moore D. and Touchard G.}
+  \Review{Earth Planet. Sci. Lett.}
+  \Vol{104}
+  \Year{1991}
+  \Page{25--35}
+\bibitem{babadagli_fractal_2003}
+  \Name{Babadagli T. and Develi K.}
+  \Review{Theor. Appl. Fract. Mech.}
+  \Vol{39}
+  \Year{2003}
+  \Page{73--88}
+\bibitem{xu_fractal_2016}
+  \Name{Xu X. L. and Zhang Z. Z.}
+  \Review{Adv. Mater. Sci. Eng.}
+  \Vol{2016}
+  \Year{2016}
+  \Page{1--10}
+\bibitem{otsuka_chain-reaction-type_1972}
+  \Name{Otsuka M.}
+  \Review{Journal of Physics of the Earth}
+  \Vol{20}
+  \Year{1972}
+  \Page{35--45}
+\bibitem{vere-jones_branching_1976}
+  \Name{Vere-Jones D.}
+  \Review{Pure Appl. Geophys.}
+  \Vol{114}
+  \Year{1976}
+  \Page{711--725}
+\bibitem{watanabe_stochastic_1986}
+  \Name{Watanabe K.}
+  \Review{International Journal of Rock Mechanics and Mining Sciences \& Geomechanics Abstracts}
+  \Vol{23}
+  \Year{1986}
+  \Page{431--437}
+\bibitem{kagan_stochastic_1982}
+  \Name{Kagan Y. Y.}
+  \Review{Geophys. J. R. Astron. Soc.}
+  \Vol{71}
+  \Year{1982}
+  \Page{659--691}
+\bibitem{zhuang_stochastic_2015}
+  \Name{Zhuang J. and Touati S.}
+  \Review{Community Online Resource for Statistical Seismicity Analysis}
+  \Year{2015}
+\bibitem{rundle_dynamics_1996}
+  \Name{Rundle J. B., Klein W. and Gross S.}
+  \Review{Phys. Rev. Lett.}
+  \Vol{76}
+  \Year{1996}
+  \Page{4285--4288}
+\bibitem{nakamula_automatic_2007}
+  \Name{Nakamula S., Takeo M., Okabe Y. and Matsuura M.}
+  \Review{Earth Planets Space}
+  \Vol{59}
+  \Year{2007}
+  \Page{567--577}
+\bibitem{wu_stochastic_2018}
+  \Name{Wu T. -H. and Chen C. -C.}
+  \Review{arXiv:1811.12567v2 [physics.geo-phy]}
+  \Year{2018}
+\bibitem{van_kampen_stochastic_1992}
+  \Name{Van Kampen N. G.}
+  \Book{Stochastic processes in physics and chemistry}
+  \Vol{1}
+  \Publ{Elsevier}
+  \Year{1992}
+\bibitem{coffey_langevin_2012}
+  \Name{Coffey W. T. and Kalmykov Y. P.}
+  \Book{The {Langevin} {Equation}: {With} {Applications} to {Stochastic} {Problems} in {Physics}, {Chemistry} and {Electrical} {Engineering}}
+  \Publ{World Scientific}
+  \Year{2012}
+\bibitem{byerlee_friction_1978}
+  \Name{Byerlee J.}
+  \Review{Pure Appl. Geophys.}
+  \Vol{116}
+  \Year{1978}
+  \Page{615--626}
+\bibitem{armstrong-helouvry_control_1991}
+  \Name{Armstrong-H?louvry B.}
+  \Book{Control of {Machines} with {Friction}}
+  \Publ{Springer US}
+  \Year{1991}
+\bibitem{h._olsson_friction_1997}
+  \Name{, , ,  and }
+  \title{Friction {Models} and {Friction} {Compensation}}
+  \Year{1997}
+\bibitem{marone_laboratory-derived_1998}
+  \Name{Marone C.}
+  \Review{Annu. Rev. Earth Planet. Sci.}
+  \Vol{26}
+  \Year{1998}
+  \Page{643--696}
+\bibitem{frene_section_2001}
+  \Name{Fr?ne J. E. A. N. and Cicone T. R. A. I. A. N.}
+  \title{{SECTION} 8.4 - {Friction} in {Lubricated} {Contacts}}
+  \Editor{Lemaitre, JEAN}
+  \Publ{Academic Press}
+  \Year{2001}
+  \Page{760--767}
+\bibitem{de_wit_new_1995}
+  \Name{de Wit C. C., Olsson H., Astrom K. J. and Lischinsky P.}
+  \Review{IEEE Trans. Autom. Control}
+  \Vol{40}
+  \Year{1995}
+  \Page{419--425}
+\bibitem{risken_fokker-planck_1989}
+  \Name{Risken H.}
+  \Book{The {Fokker}-{Planck} equation: methods of solution and applications}
+  \Publ{Springer-Verlag}
+  \Year{1989}
+\bibitem{jacobs_stochastic_2010}
+  \Name{Jacobs K.}
+  \Book{Stochastic processes for physicists: understanding noisy systems}
+  \Publ{Cambridge University Press}
+  \Year{2010}
+\bibitem{fisher_theory_1925}
+  \Name{Fisher R. A.}
+  \Review{Math. Proc. Cambridge Philos. Soc.}
+  \Vol{22}
+  \Year{1925}
+  \Page{700--725}
+\bibitem{frieden_fisher_1990}
+  \Name{Frieden B. R.}
+  \Review{Phys. Rev. A}
+  \Vol{41}
+  \Year{1990}
+  \Page{4265--4276}
+\bibitem{martin_fishers_1999}
+  \Name{Martin M. T., Pennini F. and Plastino A.}
+  \Review{Phys. Lett. A}
+  \Vol{256}
+  \Year{1999}
+  \Page{173--180}
+\bibitem{martin_fisher_2001}
+  \Name{Martin M. T., Perez J. and Plastino A.}
+  \Review{Physica A}
+  \Vol{291}
+  \Year{2001}
+  \Page{523--532}
+\bibitem{lovallo_complexity_2011}
+  \Name{Lovallo M. and Telesca L.}
+  \Review{J. Stat. Mech: Theory Exp.}
+  \Vol{2011}
+  \Year{2011}
+  \Page{P03029}
+\bibitem{telesca_analysis_2011}
+  \Name{Telesca L. and Lovallo M.}
+  \Review{J. Stat. Mech: Theory Exp.}
+  \Vol{2011}
+  \Year{2011}
+  \Page{P07001}
+\bibitem{telesca_analysis_2011-1}
+  \Name{Telesca L., Lovallo M., Hsu H. -L. and Chen C. -C.}
+  \Review{Physica A}
+  \Vol{390}
+  \Year{2011}
+  \Page{1350--1355}
+\bibitem{telesca_time-dependent_2010}
+  \Name{Telesca L., Lovallo M. and Carniel R.}
+  \Review{J. Volcanol. Geotherm. Res.}
+  \Vol{195}
+  \Year{2010}
+  \Page{78--82}
+\bibitem{telesca_nonlinear_2009}
+  \Name{Telesca L., Lovallo M., Ramirez-Rojas A. and Angulo-Brown F.}
+  \Review{Physica A}
+  \Vol{388}
+  \Year{2009}
+  \Page{2036--2040}
+\bibitem{cyganowski_elementary_2001}
+  \Name{Cyganowski S., Kloeden P. and Ombach J.}
+  \Book{From elementary probability to stochastic differential equations with {MAPLE}?}
+  \Publ{Springer Science \& Business Media}
+  \Year{2001}
+\bibitem{devroye_course_1987}
+  \Name{Devroye L.}
+  \Book{A course in density estimation}
+  \Publ{Birkhauser Boston Inc.}
+  \Year{1987}
+\bibitem{janicki_simulation_1994}
+  \Name{Janicki A. and Weron A.}
+  \title{Simulation and {Chaotic} {Behavior} of {Alpha}-stable {Stochastic} {Processes}}
+  \Year{1994}
+\bibitem{telesca_performance_2017}
+  \Name{Telesca L. and Lovallo M.}
+  \Review{Physica A}
+  \Vol{484}
+  \Year{2017}
+  \Page{569--576}
+\bibitem{chelani_irregularity_2014}
+  \Name{Chelani A. B.}
+  \Review{Stochastic environmental research and risk assessment}
+  \Vol{28}
+  \Year{2014}
+  \Page{921--925}
+\bibitem{fath_regime_2003}
+  \Name{Fath B. D., Cabezas H. and Pawlowski C. W.}
+  \Review{J. Theor. Biol.}
+  \Vol{222}
+  \Year{2003}
+  \Page{517--530}
+\bibitem{troudi_analytical_2008}
+  \Name{Troudi M., Alimi A. M. and Saoudi S.}
+  \Review{EURASIP Journal on Advances in Signal Processing}
+  \Vol{2008}
+  \Year{2008}
+  \Page{739082}
+\bibitem{raykar_fast_2006}
+  \Name{Raykar V. C. and Duraiswami R.}
+  \title{Fast optimal bandwidth selection for kernel density estimation}
+  \Publ{Society for Industrial and Applied Mathematics}
+  \Year{2006}
+  \Page{524--528}
+\bibitem{frieden_physics_1998}
+  \Name{Frieden B. R.}
+  \Book{Physics from {Fisher} {Information}: {A} {Unification}}
+  \Publ{Cambridge University Press}
+  \Year{1998}
+\bibitem{vignat_analysis_2003}
+  \Name{Vignat C. and Bercher J. -F.}
+  \Review{Phys. Lett. A}
+  \Vol{312}
+  \Year{2003}
+  \Page{27--33}
+\bibitem{nosonovsky_entropy_2010}
+  \Name{Nosonovsky M.}
+  \Review{Entropy}
+  \Vol{12}
+  \Year{2010}
+  \Page{1345--1390}
+\bibitem{moreno-torres_investigating_2018}
+  \Name{Moreno-Torres L. R., Gomez-Vieyra A., Lovallo M., Ram?rez-Rojas A. and Telesca L.}
+  \Review{Physica A}
+  \Year{2018}
+\bibitem{hess_friction_1990}
+  \Name{Hess D. P. and Soom A.}
+  \Review{J. Tribol.}
+  \Vol{112}
+  \Year{1990}
+  \Page{147--152}
+\bibitem{brodsky_elastohydrodynamic_2001}
+  \Name{Brodsky E. E. and Kanamori H.}
+  \Review{Journal of Geophysical Research: Solid Earth}
+  \Vol{106}
+  \Year{2001}
+  \Page{16357--16374}
+\bibitem{kilb_initial_1999}
+  \Name{Kilb D. and Gomberg J.}
+  \Review{J. Seismolog.}
+  \Vol{3}
+  \Year{1999}
+  \Page{409--420}
+\bibitem{ellsworth_observation_1998}
+  \Name{Ellsworth W. L. and Beroza G. C.}
+  \Review{Geophys. Res. Lett.}
+  \Vol{25}
+  \Year{1998}
+  \Page{401--404}
+\bibitem{brune_implications_1979}
+  \Name{Brune J. N.}
+  \Review{Journal of Geophysical Research: Solid Earth}
+  \Vol{84}
+  \Year{1979}
+  \Page{2195--2198}
+\bibitem{olson_deterministic_2005}
+  \Name{Olson E. L. and Allen R. M.}
+  \Review{Nature}
+  \Vol{438}
+  \Year{2005}
+  \Page{212--215}
+\bibitem{wu_magnitude_2006}
+  \Name{Wu Y. -M. and Zhao L.}
+  \Review{Geophys. Res. Lett.}
+  \Vol{33}
+  \Year{2006}
+\end{thebibliography}
