@@ -11,6 +11,14 @@ T.namePair = cell(NoR,2);
 
 % table('Sz',[NoA,],'VariableNames',{},)
 
+%% best way to preallocate table
+% https://www.mathworks.com/matlabcentral/answers/395534-how-to-preallocate-tables-using-the-table-function
+
+tic
+t = table(randi(10,sz,1),randi(10,sz,1),randi(10,sz,1), 'VariableNames', {'a', 'b', 'c'});
+toc
+
+
 %% structure prelocation
 NoC3 = 6; NoA = 5;
 colNm3 =  {'DateNum','tsAIN_S','tsAIN_K','tsAIN_mu','tsAIN_V','Athr'};

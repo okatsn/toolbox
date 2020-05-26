@@ -20,7 +20,7 @@ LineWidth = 1.6;
 %%
 r = inputParser2(varargin,Settings);
 switch class1Arg
-    case 'cell'
+%     case 'cell'
         
     case 'matlab.graphics.axis.Axes'
         targetAxes = varargin{1};
@@ -74,7 +74,7 @@ if r.thicker %Line and Box
                 set(targetLine{i},'LineWidth', LineWidth);
         end
     else
-       warning(warningmsg);
+       warning('No targetLine.');
     end
     if ~isequal(setbox,-1)
         set(targetAxes,'LineWidth',setbox);
