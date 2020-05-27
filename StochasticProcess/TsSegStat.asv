@@ -150,11 +150,11 @@ for i = 1:maxiters %i = maxiters goes wrong.
         avgY_tmp_1 = avgY_tmp_1 + avgY_tmp_2;
 
 
-        if checkLong &&  i >= maxiters/2
-            if checkLongCount<12
+        if checkLong
+            if checkLongCount<6
                 figure;
                 plot(segments_all{1});
-                tlt2 = 'Long process that keeps going in this loop';
+                tlt2 = 'Long process that is still  continuous';
                 title(tlt2);
                 drawnow;
             end

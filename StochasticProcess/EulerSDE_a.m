@@ -108,7 +108,7 @@ if ~isequal(SaveInplace,0)
         endidx = size_T(1);
         t = matf.X(endidx,1); %don't use 'end', for example matf.traceT(end) will force load variable into memory
         y = matf.Y(endidx,1);
-    else
+    else % create new matfile
 %         FileExist = false;
         X = [];
         Y = [];
@@ -121,7 +121,7 @@ if ~isequal(SaveInplace,0)
     end
     
     
-%     if isfield(matf,'StartPoint') % is field cannot work with fields of matfile
+%     if isfield(matf,'StartPoint') % isfield cannot work with fields of matfile
         matf.StartPoint =  [matf.StartPoint, max(size_T) +1]; % previous [StartPoint, EndPoint +1];
 %     else
 %         matf.StartPoint =  [NaN, max(size_T) +1]; % 

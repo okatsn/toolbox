@@ -1,8 +1,7 @@
 function [C,varargout] = split_by_thr(Y_i,thr)
 % split the input time series by a certain threshold thr.
 % [segments_all,desired,undesired] = split_by_thr(Y_i,threshold)
-%     - desired: the segments where Y>thr.
-%     - undesired: the segments where Y<thr, the data are all replaced by NaN.
+- desired: the segments where Y>
 
 errorStruct.identifier = 'Custom:Error';
 
@@ -14,7 +13,7 @@ errorStruct.identifier = 'Custom:Error';
 
 Y = Y_i(:); % to make sure Y is N by 1.
 Y2 = Y;
-Y2(Y2<thr) = NaN;
+Y2(Y2<=thr) = NaN;
 
 id_nan = isnan(Y2);
 diff_id_nan = diff(id_nan);
