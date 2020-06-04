@@ -48,7 +48,7 @@ if numel(fNms) ==1
     outputArg2 = inputArg1.(fNms{1});
     fieldname = fNms{1};
 else
-    errorStruct.message = 'Input structure have multiple fields. It is dangerous to assign fields to varargout.';
+    errorStruct.message = 'Input structure have multiple or zero fields.';
     error(errorStruct);           
 end
 

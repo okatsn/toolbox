@@ -268,7 +268,7 @@ for k=1:m
 
 
 end
-
+delete(H.waitbarHandle);
 % else
 %     dW=sigma.*randn(1,steps)+mm;%平均值為零%一次產生n個隨機變數(1列n行)。Nw=steps+1;
 %     traceT=NaN(1,Nw); traceY=NaN(1,Nw);

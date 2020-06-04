@@ -28,7 +28,7 @@ addParameter(p,'PlotVerticalLine',0);
 addParameter(p,'PlotEpicenter',0,validPlotEpicenter);
 addParameter(p,'EpicenterMarkerSize',999);
 addParameter(p,'MagnitudeTag',0);
-pm2 = 'ConsiderDepth'; addParameter(p,pm2,0,valid10);
+pm2 = 'ConsiderDepth'; addParameter(p,pm2,1,valid10);
 
 % addParameter(p,'PlotVerticalLine',0);
 % addParameter(p,'ConsiderDepth',0);

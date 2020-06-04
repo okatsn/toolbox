@@ -161,7 +161,7 @@ dir_list.fullpath = cellfun(@(x, y) fullfile(x, y), ...
 
 % furthermore
 % if isequal(Basic,0)
-dir_list.name = regexprep(dir_list.file, '\.\w+', '');
+dir_list.name = regexprep(dir_list.file, '\.\w+$', '');
 dir_list.date = {dir_info.date}';
 dir_list.datenum = {dir_info.datenum}';
 dir_list.relativepath = cellfun(@(x) relativepath(x), ...
