@@ -52,6 +52,8 @@ FitType = rst.DataFit;
 if isequal(memoryLimit,0)
     % estimate appropriate array size to be load a time according to memory.
     memoryLimit = limitnumel('double'); 
+else
+    memoryLimit = round(memoryLimit); % to avoid error.
 end
 
 %%

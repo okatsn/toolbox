@@ -20,6 +20,14 @@
 %         smooth:  
 %             e.g. smooth = '100pt'; % smooth to total 100 points.
 %             e.g. smooth = '0.1sec'; % averaging window is 0.1 second.
+%         MemoryLimit: (2020-06-04)
+%             Manually assign the largest number of elements of the array at a time.
+%             In default the function will automatically decide the number 
+%             by estimating the available memory of the device at current state.
+%             However, if you use parfor to run this function, the number should
+%             be divided by the number of parfor iterations; otherwise, 
+%             memory might runs out. That is, you should manually set 'MemoryLimit' 
+%             when the function is executed inside the parfor loop.
 %
 % Becareful when change the variable name 'traceT';
 %
@@ -38,7 +46,6 @@
 % influence of drift term in microscale.  
 function [ O ] = EulerSDE_a(D,varargin )% EulerSDE_a(D,r,totalTime,Y0,dt)
 default_r = 1; default_totalTime = 10; default_Y0 = 0; default_dt = 1e-3;  default_Friction = 'dry';
-memoryLimit = 6e7;
 
 errorStruct.identifier = 'Custom:Error';
 default_VH = 0; %default_outputdW=0; 
@@ -66,6 +73,8 @@ addParameter(p,'information',0);
 addParameter(p,'SaveInplace',0); 
 addParameter(p,'ConstantForce',0);
 addParameter(p,'TimeElapse',false);
+addParameter(p,'MemoryLimit',0);
+
 
 % addParameter(p,'SteadyStateMean',0); % comparing with the theoretical averaged value in stationary state.
 % 'SteadyStateMean',0.3 will average the last 30% of Y as steady state average.
@@ -87,6 +96,15 @@ Fcxdt = constantForce*dt;
 % SteadyStateMean = results.SteadyStateMean;
 % function_ = results.function;
 % FrictionType = results.FrictionType; 
+memoryLimit = results.MemoryLimit;
+
+if isequal(memoryLimit,0)
+    % estimate appropriate array size to be load a time according to memory.
+    memoryLimit = limitnumel('double')*0.85;
+else
+    memoryLimit = round(memoryLimit); % to avoid error.
+end
+
 
 Save2 = false;
 t = 0; y=Y0; % must precede t = matf.traceT(end);
@@ -95,7 +113,7 @@ if ~isequal(SaveInplace,0)
         warning("'SaveInplace' is assigned, 'smooth' has been reset to zero.")
         smooth=0;
     end
-    totalTime_j = min([totalTime,round(memoryLimit*0.7*dt,-2)]);
+    totalTime_j = min([totalTime,round(memoryLimit*dt,-2)]);
     iter_j = ceil(totalTime/totalTime_j);
     fprintf('OutputDuration/totalTime = %.2f/%.2f \n',totalTime_j*iter_j,totalTime)
     Save2 = true;   
@@ -182,7 +200,7 @@ end
 % permission = 'yes';
 if or(Nw>memoryLimit,m>memoryLimit)
 %     permission = input('Large array warning, may run out of memory. Continue anyway ? [yes/no]','s');
-    warning('Large array warning, memory may run out. Be careful to the status of memory usage');
+    warning('(You should not see this) Large array warning, memory may run out. Be careful to the status of memory usage');
     pause(5);
 end
 
