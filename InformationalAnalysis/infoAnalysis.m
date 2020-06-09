@@ -20,10 +20,10 @@ function [varargout] = infoAnalysis(inputTs,informationalType,varargin)
 %         - the window moves at a fixed step of 1000.
 
 
-
+% indices of built-in functions
 idx.FIM = 1; % 1st:  Fisher information
 idx.Nx = 2;  % 2nd: Shannon Entropy
-
+wrongfunctiontype = 'Wrong function type. It must be char or cell array containing char or function_handle.';
 validInt = @(x) isnumeric(x) && floor(x)==x;
 validIntorLogic = @(x)  islogical(x)|| isnumeric(x) && floor(x)==x;
 p = inputParser;
@@ -50,25 +50,43 @@ switch class(informationalType)
         informationalType = {informationalType};
     case 'cell'
         
+    case 'function_handle'
+        informationalType = {informationalType};
     otherwise
-        error('Wrong function type. It must be char or cell array containing char');
+        error(wrongfunctiontype);
     
 end
+
+
 NoTask = length(informationalType);
 calcRng = []; % index for infoFuncArray
 
+numextra_id = NoFunc;
+
 for i = 1:NoTask
-    switch informationalType{i}
-        case {'Fisher','FisherInformation','FIM'}
-            calcRng = [calcRng,idx.FIM]; 
-        case {'Shannon','ShannonEntropy','ShannonEntropyPower'}
-            calcRng = [calcRng,idx.Nx];
-            
-        otherwise
-            error('Unknown function name.');
+    informationalType_i = informationalType{i};
+    if isa(informationalType_i,'char')
+        switch informationalType_i
+            case {'Fisher','FisherInformation','FIM'}
+                calcRng = [calcRng,idx.FIM]; 
+            case {'Shannon','ShannonEntropy','ShannonEntropyPower'}
+                calcRng = [calcRng,idx.Nx];
+
+            otherwise
+                error('Unknown function name.');
+        end
+    elseif isa(informationalType_i,'function_handle')
+        numextra_id = numextra_id + 1;
+        calcRng = [calcRng, numextra_id];
+        infoFuncArray{numextra_id} = informationalType_i;
+
+    else
+        error(wrongfunctiontype);
+        
     end
 end
 
+NoFunc2 = numextra_id;
 
 if isequal(WLength,0)
     WLength = round(TsLength*0.1);
@@ -81,7 +99,7 @@ if WLength>TsLength
 end
 
 % outputCell = cell(NoTask,1);
-OutputInfo = NaN(TsLength,NoFunc);
+OutputInfo = NaN(TsLength,NoFunc2);
 
 % output timeseries starts from the end of the first moving time window.
 % e.g. if Window length = 500, the 501th is the first calculated shannon entropy for inputTs(1:500). 
@@ -161,7 +179,7 @@ for i = Rangei
     end
 end
 
-varargout0 = mat2cell(OutputInfo,[TsLength],ones(1,NoFunc));
+varargout0 = mat2cell(OutputInfo,[TsLength],ones(1,NoFunc2));
 
 varargout = varargout0(calcRng); 
 

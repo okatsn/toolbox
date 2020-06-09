@@ -14,7 +14,16 @@ errorStruct.identifier = 'Custom:Error';
 
 Y = Y_i(:); % to make sure Y is N by 1.
 Y2 = Y;
-Y2(Y2<thr) = NaN;
+
+lenthr = length(thr);
+if lenthr == 1
+    Y2(Y2<thr) = NaN;
+elseif lenthr
+    sort(thr); 
+    Y2(Y2>thr(1) & Y2<thr(2)) = NaN;
+else
+    error('thr must be scalar or 2-element vector.');
+end
 
 id_nan = isnan(Y2);
 diff_id_nan = diff(id_nan);
