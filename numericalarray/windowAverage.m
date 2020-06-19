@@ -4,7 +4,7 @@
 % [Xs,Ys] = windowAverage(inputXY,'FieldName',{'fieldnameX','fieldnameY'})
 function [XY] = windowAverage(inputXY,varargin)
 funNm = 'windowAverage';
-memoryLimit = 6e7; % the maximum data points to be loaded at once.
+memoryLimit = limitnumel; % the maximum data points to be loaded at once.
 errorStruct.identifier = 'Custom:Error';
 p = inputParser;
 addParameter(p,'WindowWidth',100);

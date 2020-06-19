@@ -19,22 +19,33 @@ lenthr = length(thr);
 if lenthr == 1
     Y2(Y2<thr) = NaN;
 elseif lenthr
-    sort(thr); 
-    Y2(Y2>thr(1) & Y2<thr(2)) = NaN;
+    thr = sort(thr); 
+    Y2(Y>thr(1) & Y<thr(2)) = NaN;
 else
     error('thr must be scalar or 2-element vector.');
 end
 
 id_nan = isnan(Y2);
-diff_id_nan = diff(id_nan);
-diff_id_nan_extend = [1;diff_id_nan;1];
-id_y = find(diff_id_nan_extend); % find the index of non-zero element, that is the place to split
-id_z = diff(id_y);
-C = mat2cell(Y2,id_z(:),size(Y2,2));
+notNaN = ~id_nan;
+
+id_nansplit = diff(id_nan); % indicates the midpoints that separate NaN and non-NaN elements.
+id_cross = adjMultiply(Y2) < 0; % indicates the midpoints where Y(i)*Y(i - 1) are negative.
+% ... that is, Y transits from positive to negative, or vice versa.
+id_bothOutside = adjAND(notNaN); % indicates the midpoints where both Y(i) and Y(i - 1) are not NaN.
+% ... that is, Y(i) and Y(i - 1) are outside thr.
+id_nonansplit = and(id_cross, id_bothOutside);
+id_split = or(id_nansplit,id_nonansplit);
+id_split_ext = [1;id_split;1];
+edges = find(id_split_ext); % the edges/boundaries for segments.
+id_nonansplit_ext = [0;id_nonansplit;0];
+edges2 = sort([edges; find(id_nonansplit_ext)]);
+durations = diff(edges2); % the duration/numel of each segment.
+C = mat2cell(Y2,durations(:),size(Y2,2));
 
 
 if nargout>1
-    if all(isnan(C{1})) % all is faster than any
+    firstseg = C{1};
+    if all(isnan(firstseg)) || isempty(firstseg) % all is faster than any
         desired_segment = C(2:2:end);
         undesired_segment = C(1:2:end);
     else

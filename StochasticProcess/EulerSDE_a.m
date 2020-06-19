@@ -286,7 +286,9 @@ for k=1:m
 
 
 end
-delete(H.waitbarHandle);
+if TimeElapseTR
+    delete(H.waitbarHandle);
+end
 % else
 %     dW=sigma.*randn(1,steps)+mm;%平均值為零%一次產生n個隨機變數(1列n行)。Nw=steps+1;
 %     traceT=NaN(1,Nw); traceY=NaN(1,Nw);
@@ -381,9 +383,9 @@ O.mean_Y_predicted = Y_avg_predicted;
   
  %% save variable
   if save_to == 1
-      save_to = 'sample path'; % save to default folder
+      save_to = ''; % save to current path.
   end
-  if save_to ~= 0
+  if ~isequal(save_to,0)
      fn = fullfile(pwd,save_to);
         if exist(fn, 'dir')
            fprintf('save to %s',save_to);
@@ -396,7 +398,7 @@ O.mean_Y_predicted = Y_avg_predicted;
 %         save(target_dir,'O','-v7.3');% for variable larger than 2GB
         save(target_dir,'O');
   end
-
+    
   
 end
 %% annotation

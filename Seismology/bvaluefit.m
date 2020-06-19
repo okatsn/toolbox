@@ -20,10 +20,14 @@ function [a_b_array] = bvaluefit(y,ccdfY,varargin)
 %  4. Preview on the fitting result
 %      bvaluefit(...,'loglogPlot',1);
 a0 = 5;
-b0 = 0.1;
+b0 = 0.1; % InitialGuess
+
+default_modelfun = @(c,y) 10.^(c(1)-c(2)*log10(y)); % 10.^(a-b*log10(y))
+% default_modelfun = @(c,y) exp(c(1)-c(2)*log(y));
 
 p = inputParser;
 addParameter(p,'SegmentNumber',2);
+addParameter(p,'ModelFunction',default_modelfun);
 addParameter(p,'InitialGuess',[a0,b0]);
 addParameter(p,'Padding',0.05); % padding in y_range before fitting
 addParameter(p,'loglogPlot',0);
@@ -31,6 +35,7 @@ addParameter(p,'loglogPlot',0);
 
 parse(p,varargin{:});
 
+modelfun = p.Results.ModelFunction;
 numclusters = p.Results.SegmentNumber;
 beta0 = p.Results.InitialGuess; % initial guess
 do_plot = ~isequal(p.Results.loglogPlot,0);
@@ -56,8 +61,7 @@ if size(beta0,1) == 1
 end
 
 leny =length(y);
-modelfun = @(c,y) 10.^(c(1)-c(2)*log10(y)); % 10.^(a-b*log10(y))
-% modelfun = @(c,y) exp(c(1)-c(2)*log(y));
+
 
 y = y(:);
 ccdfY = ccdfY(:);

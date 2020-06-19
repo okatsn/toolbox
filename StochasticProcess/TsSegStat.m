@@ -1,4 +1,7 @@
 function [S] = TsSegStat(matfile1,varargin)
+% How to use:
+%     mtf = matfile('a_matfile_store_timeseries_Y.mat');
+%     S = TsSegStat(mtf); % field name 'Y' must exist.
 % - Calculate statistics of every segments from Time series stored in matfile.
 % - The timeseries (t,v)  is read from matfile in batches for memory reason.
 % - A segment is defined as the interval between two nearest adjacent points 
@@ -41,6 +44,7 @@ p = inputParser;
 addParameter(p,'MemoryLimit',0);
 addParameter(p,'Threshold',0.01);
 addParameter(p,'Validation',0);
+addParameter(p,'matfileSave',0);
 addParameter(p,'DataFit',0);
 parse(p,varargin{:});
 rst = p.Results;
@@ -48,6 +52,8 @@ memoryLimit = rst.MemoryLimit;
 thr = rst.Threshold;
 Validation = rst.Validation;
 FitType = rst.DataFit;
+matfileSave = rst.matfileSave;
+
 
 if isequal(memoryLimit,0)
     % estimate appropriate array size to be load a time according to memory.
@@ -82,12 +88,28 @@ end
 
 fprintf('%s Cut-off threshold: %.6f \n',funNm,thr);
 
-sizeT = size(matfile1,'X'); % Don't use "size(mtf.traceT)"
+sizeT = size(matfile1,'Y'); % Don't use "size(mtf.traceT)"
 
-[outputTable] = matfileWhos(matfile1);
-S = struct();
-S.Info = outputTable;
 
+
+if ~isequal(matfileSave,0)
+    if ischar(matfileSave) || isStringScalar(matfileSave)
+        
+    else
+        matfileSave = pathnonrepeat('temp.mat');
+        fprintf('Save the file to %s in the current directory. \n',matfileSave);
+    end
+    S = matfile(matfileSave);    
+else
+    S = struct();    
+end
+
+try
+    [outputTable] = matfileWhos(matfile1);
+    S.Info = outputTable;
+catch ME
+    warning('Failed in matfileWhos. There will be no information of this matfile.');
+end
 
 
 

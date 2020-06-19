@@ -34,14 +34,14 @@ classdef goto
         function dir_x = gji20()
             root0 = RootFolder;
             dir_x = fullfile(root0,'0MyResearch','(0)submission',...
-                'manuscript GJI 2020','matlab_script');
+                'manuscript GJI 2020','gji2020_manuscript','matlab_script');
             cd(dir_x);
         end
         
         function dir_x = gji20rup()
             root0 = RootFolder;
             dir_x = fullfile(root0,'0MyResearch','(0)submission',...
-                'manuscript GJI 2020','matlab_script','RuptureStatistics');
+                'manuscript GJI 2020','gji2020_manuscript','matlab_script','RuptureStatistics');
             cd(dir_x);
         end
         

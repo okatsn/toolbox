@@ -22,8 +22,7 @@ if isempty(tableORowNames)
             error('Cannot find a variable containing names in the table.');
         end
     catch ME
-        ME.message = sprintf('Failed when applying building names. (%s)',ME.message);
-        error(ME);
+        error('Failed when applying building names. (%s)',ME.message);
     end
     
     
