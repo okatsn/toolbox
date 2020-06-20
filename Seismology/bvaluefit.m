@@ -78,7 +78,19 @@ X = [log_y,log_ccdfY];
 
 if numclusters > 1
 clusteridx = kmeans(X,numclusters); 
-splitpoint = find(diff(clusteridx));
+splitpoint = find(diff(clusteridx)); 
+expected_n = numclusters-1;
+if length(splitpoint) > expected_n
+% ideally, clusteridx should be such as 1 1 1 2 2 2...
+% and hence we can use diff to find the splitpoint (at 3 for this case).
+% However, sometimes it's not ideal and may gives such as 1 1 2 1 2 2...,
+% and consequently find(diff(clusteridx)) gives splitpoint as 2,3,4.
+% We hence sort and take average on these superfluous split points.
+    splitpoint = sort(splitpoint);
+    splitpoint_ext = extendToMMultiples(splitpoint,expected_n);
+    splitpoint_reshape = reshape(splitpoint_ext,[],expected_n);
+    splitpoint = nanmean(splitpoint_reshape,1);
+end
 edges = [1,splitpoint,leny];
 else
     edges = [1,leny];
@@ -88,7 +100,9 @@ a_b_array = NaN(numclusters,length(beta0));
 
 for i = 1:numclusters
     yrangepad = floor(leny*Padding(i,:));
-    yrange = edges(i:i+1) + yrangepad;
+%     yrange = edges(i:i+1) + yrangepad;
+    ystartend = edges(i:i+1) + yrangepad; % bug fixed 2020.06.20
+    yrange = ystartend(1):ystartend(2);
     yi = y(yrange);
     ccdfYi = ccdfY(yrange);
     beta0_i = beta0_array(i,:);
@@ -96,11 +110,10 @@ for i = 1:numclusters
 end
 
 if do_plot
-%     figure;
-%     loglog(y,ccdfY,'o');
-%     hold on
     for i = 1:numclusters
-        yrange = edges(i:i+1);       
+%         yrange = edges(i:i+1);
+        ystartend = edges(i:i+1); % bug fixed 2020.06.20
+        yrange = ystartend(1):ystartend(2);
         yi = y(yrange);
         pred_ccdfYi = modelfun(a_b_array(i,:),yi);
         loglog(yi,pred_ccdfYi,'--');

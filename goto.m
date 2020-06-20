@@ -38,17 +38,31 @@ classdef goto
             cd(dir_x);
         end
         
-        function dir_x = gji20rup()
+        function dir_return = gji20rup()
             root0 = RootFolder;
             dir_x = fullfile(root0,'0MyResearch','(0)submission',...
                 'manuscript GJI 2020','gji2020_manuscript','matlab_script','RuptureStatistics');
-            cd(dir_x);
+            dir_data = fullfile(root0,'1Programming','DATA','TEX_fit_SDE_gen_DATA','GJI20');
+            if nargin>0
+                % don't cd
+                dir_return = dir_x;
+                fprintf('No cd, and return the directory of scripts. \n');
+            else
+                cd(dir_x);
+                dir_return = dir_data;
+                fprintf('Current working directory switched to %s\n',dir_x);
+                fprintf('Return the directory for data in workspace: \n');
+            end
         end
         
-        function dir_x = toolbox()
+        function dir_x = toolbox(varargin)
             root0 = RootFolder;
             dir_x = fullfile(root0,'1Programming','MATLAB','toolbox');
-            cd(dir_x);
+            if nargin>0
+                % don't cd
+            else
+                cd(dir_x);
+            end
         end
         
         function dir_x = cwb()
