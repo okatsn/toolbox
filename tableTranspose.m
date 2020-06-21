@@ -1,18 +1,20 @@
-function [tableT] = tableTranspose(tableO)
+function [tableT] = tableTranspose(tableO, varargin)
+% [tableT] = tableTranspose(tableO);
+% [tableT] = tableTranspose(tableO,'nowarn') % suppress warnings
 % Reference 
 % https://www.mathworks.com/matlabcentral/answers/395567-how-can-i-transpose-a-dataset-or-table
 funcNm = 'tableTranspose';
 tableORowNames = tableO.Properties.RowNames;
 Xc = table2cell(tableO);
 if isempty(tableORowNames)
-    warning('[%s] Table do not have RowNames.',funcNm);
+%     warning('[%s] Table do not have RowNames.',funcNm);
     rowNmCandidate = {'name','names'};
     Lia = ismember(rowNmCandidate,tableO.Properties.VariableNames);
     try
         if any(Lia)
             idx = find(Lia,1); % find only one element is enough.
             buildInName = rowNmCandidate{idx};
-            warning("[%s] Use inputTable.%s to be the RowNames.",funcNm,buildInName);
+%             warning("[%s] Use inputTable.%s to be the RowNames.",funcNm,buildInName);
             tableO.Properties.RowNames = tableO.(buildInName);% update table RowNames
     %         NoR =size(tableO,1);
     %         AutoRowName = cell(NoR,1);

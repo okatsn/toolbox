@@ -69,11 +69,11 @@ switch class(inputXY)
         [maxsize,maxdim] = max(size(mtf,FieldName{1})); %Use "size(mtf,'traceT')";  Don't use "size(mtf.traceT)"
         NoV = length(FieldName);
         WWidth = ceil(memoryLimit/AvgWindowWidth)*AvgWindowWidth; 
-        % this makes WWidth the multiple of AvgWindowWidth in order to be correctly reshaped
+        % make WWidth the multiple of AvgWindowWidth in order  able to be reshaped
         total_iter = ceil(maxsize/WWidth);
         nanArray = [];
 
-%         tic; H = timeLeft0(total_iter,funNm);
+        tic; H = timeLeft0(total_iter,funNm);
 %         if maxsize/AvgWindowWidth > memoryLimit
 %             warning('Memory may runs out in the end.')
 %         end
@@ -99,8 +99,8 @@ id0 = 1;
 id1 = WWidth;
 if id1 > maxsize
     id1 = maxsize;
-    % in each iters there're exactly WWidth points to be reshaped.
-    nanArray = NaN(WWidth - id1,1); % to make [mtf.X;nanArray] total WWdith points.
+    numelrem
+    nanArray = NaN(numelrem,1);
     if total_iter ~= 1
         % if WWidth is larger than maxsize, then there must be only 1 loop
         % (i.e. total_iter == 1)
@@ -114,15 +114,15 @@ nid0 = 1;
 nid1 = new_pt_per_iter;
 for J = 1:total_iter% id0<id1
     if avgMatfile
-%         [H] = timeLeft1(toc,J,H);
+        [H] = timeLeft1(toc,J,H);
         XY = cell(1,NoV);
         if maxdim ==1
             for i = 1:NoV
-%                 try
+                try
                 XY{i} = [mtf.(FieldName{i})(id0:id1,1);nanArray];
-%                 catch
-%                    disp('Set break point here to debug...') 
-%                 end
+                catch
+                   disp('Set break point here to debug...') 
+                end
             end
         else %maxdim =2
             for i = 1:NoV
