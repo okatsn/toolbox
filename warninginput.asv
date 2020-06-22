@@ -1,3 +1,5 @@
+% under construction
+
 function doit = warninginput(varargin)
 % This function prompts a window and returns false, 
 % if right button clicked or no action after 7 seconds (default);
@@ -7,13 +9,13 @@ function doit = warninginput(varargin)
 % showing on the window/buttons by using name-value pairs. See the section
 % of inputParser in the code for more information.
 %
-% Example:
-%     if warninginput
-%         % if left button clicked
-%         do_one_thing;
-%     else % if right button clicked or no action after 7 (default) seconds.
-%         do_another_thing;
-%     end
+Example:
+    if warninginput
+        % if left button clicked
+        do_one_thing;
+    else % if right button clicked or
+        do_another_thing;
+    end
 
 default_message = ["This section only has to be done once. Press Y to return true.";...
                     "If no action return false "];
