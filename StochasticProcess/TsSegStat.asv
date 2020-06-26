@@ -106,7 +106,10 @@ if issaveasmatfile
     if ~S.Properties.Writable
         error('S.Properties.Writable is false. This should not happen.');
     end
-    S_id0 = 1;
+    S.duration = [];
+    S.vsquare = [];
+    S.sumabsY = [];
+
 else
     S = struct();    
 end
@@ -132,14 +135,14 @@ id0 = 1 - memoryLimit;
 id1 = 1;
 
 duration = [];
-avgY = [];
+sumabsY = [];
 vsquare = [];
 
 tic; H = timeLeft0(maxiters,funNm);
 for i = 1:maxiters %i = maxiters goes wrong.
     duration_tmp = []; % for the long segment that cross more-than-one iterations.
     vsquare_tmp = [];  % if the long segment is not complete yet, 
-    avgY_tmp = [];     % duration_tmp  should remain empty.
+    sumabsY_tmp = [];     % duration_tmp  should remain empty.
                        % unfinished duration are summed up and temporarily
                        % stored in duration_tmp_1
     
@@ -150,9 +153,9 @@ for i = 1:maxiters %i = maxiters goes wrong.
         fprintf('[%s] Previous loop is the last loop. Iteration i = %d break.\n',funNm,i);
         break
     end
-        tY = matfile1.Y(id0:id1,1);
+        Yi = matfile1.Y(id0:id1,1);
 %     [Y_seg,idx] = split_SDE(tY);
-    [segments_all,desired,undesired] = split_by_thr(tY,thr);
+    [segments_all,desired,undesired] = split_by_thr(Yi,thr);
 
     seg_last = segments_all{end};
     seg_first = segments_all{1};
@@ -174,13 +177,13 @@ for i = 1:maxiters %i = maxiters goes wrong.
         
 %             previous_last_seg = [previous_last_seg; desired{1}]; 
             
-        [duration_tmp_2,vsquare_tmp_2,avgY_tmp_2] = calc_stat(desired(1),false);
+        [duration_tmp_2,vsquare_tmp_2,sumabsY_tmp_2] = calc_stat(desired(1),false);
         % duration_tmp_1 is created in the previous loop if
         % the last segment in previous loop is not finished.
 
         duration_tmp_1 = duration_tmp_1 + duration_tmp_2;
         vsquare_tmp_1 = vsquare_tmp_1 + vsquare_tmp_2;
-        avgY_tmp_1 = (avgY_tmp_1*duration_tmp_1 + avgY_tmp_2*duration_tmp_2)/(duration_tmp_1+duration_tmp_2);
+        sumabsY_tmp_1 = sumabsY_tmp_1 + sumabsY_tmp_2;
 
 
         if checkLong &&  i >= maxiters/2
@@ -201,7 +204,7 @@ for i = 1:maxiters %i = maxiters goes wrong.
         else % previous long time series terminates in this loop
             duration_tmp = duration_tmp_1;
             vsquare_tmp = vsquare_tmp_1;
-            avgY_tmp = avgY_tmp_1;
+            sumabsY_tmp = sumabsY_tmp_1;
             desired(1) = []; % remove the 1st segment since it has been taken into accounted.
             checkLongCount = checkLongCount+1;
         end        
@@ -228,7 +231,7 @@ for i = 1:maxiters %i = maxiters goes wrong.
         prev_seg_not_finished = false; % segment finished.
         
         vsquare_tmp_1 = 0;  % this is unnecessary
-        avgY_tmp_1 = 0;     % this is unnecessary
+        sumabsY_tmp_1 = 0;     % this is unnecessary
         duration_tmp_1 = 0; % this is unnecessary since 
                             % duration_tmp_1 = duration_tmp_1 + duration_tmp_2
                             % can be reached only if prev_seg_not_finished is true.
@@ -236,7 +239,7 @@ for i = 1:maxiters %i = maxiters goes wrong.
         % if the i-1th seg_last is not all nan (which means it's not finished yet)
         prev_seg_not_finished = true; % save and pass the last unfinished segment to next iteration.
 %         previous_last_seg = seg_last;       
-        [duration_tmp_1,vsquare_tmp_1,avgY_tmp_1,~] = calc_stat({seg_last},false);
+        [duration_tmp_1,vsquare_tmp_1,sumabsY_tmp_1,~] = calc_stat({seg_last},false);
         desired(end) = []; 
         % temporarily save the duration of the incompleted time series as duration_tmp_1, 
         % and delete the incompleted one that it won't be counted as duration_i.
@@ -247,7 +250,7 @@ for i = 1:maxiters %i = maxiters goes wrong.
     %      TsAnimation(cell2mat(desired),'WindowWidth',100);
 
     % Calculate statistics   
-    [duration_i,vsquare_i,avgY_i] = calc_stat(desired,do_fit);
+    [duration_i,vsquare_i,sumabsY_i] = calc_stat(desired,do_fit);
     
     % if prev_seg_not_finished && this_first_seg_not_NaN...
     % && previous long timeseries terminates in this loop,
@@ -255,27 +258,27 @@ for i = 1:maxiters %i = maxiters goes wrong.
     % Otherwise, it is empty.
     duration = [duration;duration_tmp;duration_i]; 
     vsquare = [vsquare;vsquare_tmp;vsquare_i];
-    avgY = [avgY;avgY_tmp;avgY_i];
+    sumabsY = [sumabsY;sumabsY_tmp;sumabsY_i];
     
     if issaveasmatfile
         len_S_tmp = length(duration);
-        if len_S_tmp > memoryLimit % then save to matfile
-            if S_id0 == 1 
-                S.duration = duration;
-                S.vsquare = vsquare;
-                S.average = avgY;
-                S_id0 = len_S_tmp + S_id0; % next index
-            else
+        if len_S_tmp > memoryLimit || i == maxiters % then save to matfile
+%             if S_id0 == 1 
+%                 S.duration = duration;
+%                 S.vsquare = vsquare;
+%                 S.sumabsY = sumabsY;
+%                 S_id0 = len_S_tmp + S_id0; % next index
+%             else
                 len_S = size(S,'duration',1);
                 S_id0 = len_S + 1;
                 S_id1 = len_S + len_S_tmp;
                 S.duration(S_id0:S_id1,1) = duration;
                 S.vsquare(S_id0:S_id1,1) = vsquare;
-                S.average(S_id0:S_id1,1) = avgY;                
-            end
+                S.sumabsY(S_id0:S_id1,1) = sumabsY;                
+%             end
             duration = [];
             vsquare = [];
-            avgY = []; % and release the memory.
+            sumabsY = []; % and release the memory.
         end
     end
     [H] = timeLeft1(toc,i,H);
@@ -285,9 +288,9 @@ delete(H.waitbarHandle);
 if ~issaveasmatfile
     S.duration = duration;
     S.vsquare = vsquare;
-    S.average = avgY;
+    S.sumabsY = sumabsY;
 else
-    % finalize matfile...
+    % do nothing, since the variables already saved.
 end
 
 S.threshold = thr;
@@ -296,7 +299,7 @@ S.threshold = thr;
 if checkNaN
     try
         S.checkNaN = 'NaN check passed.';
-        if any(isnan(duration))||any(isnan(vsquare))||any(isnan(avgY))
+        if any(isnan(duration))||any(isnan(vsquare))||any(isnan(sumabsY))
             S.checkNaN = 'NaN check NOT passed.';
         end
     catch
@@ -327,18 +330,19 @@ end
 
 end
 
-function [duration_i,vsquare_i,avgY_i,NoSeg] = calc_stat(time_series_in_cell,do_fit)
+function [duration_i,vsquare_i,sumabsY,NoSeg] = calc_stat(time_series_in_cell,do_fit)
 NoSeg = length(time_series_in_cell);
 
 nan_i = NaN(NoSeg,1);
 duration_i = nan_i;
 vsquare_i = nan_i;
-avgY_i = nan_i;
+sumabsY = nan_i;
 for k = 1:NoSeg
     seg_k = abs(time_series_in_cell{k}); % before 2020-06-09, there is no abs().
     duration_i(k) = length(seg_k);% calculate duration
     vsquare_i(k) = sum(seg_k.^2);% calculate kinetic energy (without 0.5*mass)
-    avgY_i(k) = mean(seg_k);% calculate mean
+%     sumabsY_i(k) = mean(seg_k);% calculate mean
+    sumabsY(k) = sum(abs(seg_k)); % calculate sum(v.*dt)
     if do_fit && duration_i(k)>1e4
         [CCDF,umax,u] = calc_CCDF(seg_k);
         DF1 = DataFit(u,CCDF,'TEX(CCDF)','umax',umax);

@@ -53,7 +53,6 @@ leny =length(y);
 
 [ys, ind2sorted] = sort(y); % y(ind2sorted) = ys.
 ccdfYs = ccdfY(ind2sorted);
-%% this section is superfluous and can be delete in the future.
 if ys ~= y || ccdfYs ~= ccdfY
     disp('y and Y is sorted before nlinfit.')
     y = ys;
@@ -61,7 +60,7 @@ if ys ~= y || ccdfYs ~= ccdfY
 end
 clear('ys','ccdfYs');
 
-%% define edges for clusters
+
 manually_split = ~isscalar(numclusters);
 if manually_split
     % if numclusters is not a scalar, but an array such as: [1, 100, 999]
