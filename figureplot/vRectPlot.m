@@ -11,14 +11,14 @@ p = inputParser;
 rectangle_name_value_pairs = {}; %e.g. {'Curvature',0.2};
 
 addOptional(p,'Axes',gca);
-addParameter(p,'Properties',rectangle_name_value_pairs);
+addParameter(p,'rectangleProperties',rectangle_name_value_pairs);
 % addParameter(p,'DrawNow',false);
 
 parse(p,varargin{:});
 rslt = p.Results; 
 ax = rslt.Axes;
 % DrawNow = rslt.DrawNow;
-rectProps = rslt.Properties;
+rectProps = rslt.rectangleProperties;
 parse(p,varargin{:});
 
 Y_range = ax.YLim;

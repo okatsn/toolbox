@@ -106,10 +106,7 @@ if issaveasmatfile
     if ~S.Properties.Writable
         error('S.Properties.Writable is false. This should not happen.');
     end
-    S.duration = [];
-    S.vsquare = [];
-    S.average = [];
-
+    S_id0 = 1;
 else
     S = struct();    
 end
@@ -262,20 +259,20 @@ for i = 1:maxiters %i = maxiters goes wrong.
     
     if issaveasmatfile
         len_S_tmp = length(duration);
-        if len_S_tmp > memoryLimit || i == maxiters % then save to matfile
-%             if S_id0 == 1 
-%                 S.duration = duration;
-%                 S.vsquare = vsquare;
-%                 S.average = avgY;
-%                 S_id0 = len_S_tmp + S_id0; % next index
-%             else
+        if len_S_tmp > memoryLimit % then save to matfile
+            if S_id0 == 1 
+                S.duration = duration;
+                S.vsquare = vsquare;
+                S.average = avgY;
+                S_id0 = len_S_tmp + S_id0; % next index
+            else
                 len_S = size(S,'duration',1);
                 S_id0 = len_S + 1;
                 S_id1 = len_S + len_S_tmp;
                 S.duration(S_id0:S_id1,1) = duration;
                 S.vsquare(S_id0:S_id1,1) = vsquare;
                 S.average(S_id0:S_id1,1) = avgY;                
-%             end
+            end
             duration = [];
             vsquare = [];
             avgY = []; % and release the memory.
@@ -290,7 +287,7 @@ if ~issaveasmatfile
     S.vsquare = vsquare;
     S.average = avgY;
 else
-    % do nothing, since the variables already saved.
+    % finalize matfile...
 end
 
 S.threshold = thr;

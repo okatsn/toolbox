@@ -19,6 +19,11 @@ function [a_b_array] = bvaluefit(y,ccdfY,varargin)
 %     % 10% of total elements (in head) and 20% (in tail) of 2nd segment/piece are ignored before fitting.
 %  4. Preview on the fitting result
 %      bvaluefit(...,'loglogPlot',1);
+%  5. Split input array into segments and fit separately
+%     bvaluefit(...,'SegmentNumber',3); 
+%     % devided the array into 3 segments and fit
+%     bvaluefit(...,'SegmentNumber',[1,1e3,7e6]);
+%     % split the array at y = 1, 1e3 and 7e6 (into 2 segments), and fit
 a0 = 5;
 b0 = 0.1; % InitialGuess
 
@@ -41,6 +46,15 @@ beta0 = p.Results.InitialGuess; % initial guess
 do_plot = ~isequal(p.Results.loglogPlot,0);
 Padding = p.Results.Padding;
 [hP,wP] = size(Padding);
+
+manually_split = ~isscalar(numclusters);
+if manually_split
+    % if numclusters is not a scalar, but an array such as: [1, 100, 999]
+    % that will split the whole input into two segments, y(1:100),
+    % y(100:999) and do fitting separately.
+    edges = nearest1d(y,numclusters);
+    numclusters = length(numclusters) - 1;
+end
 
 if wP == 1
     Padding = [Padding, -Padding];
@@ -76,24 +90,26 @@ log_y = log10(y);
 % X = [log_y,diff_log_ccdfY];
 X = [log_y,log_ccdfY];
 
-if numclusters > 1
-clusteridx = kmeans(X,numclusters); 
-splitpoint = find(diff(clusteridx)); 
-expected_n = numclusters-1;
-if length(splitpoint) > expected_n
-% ideally, clusteridx should be such as 1 1 1 2 2 2...
-% and hence we can use diff to find the splitpoint (at 3 for this case).
-% However, sometimes it's not ideal and may gives such as 1 1 2 1 2 2...,
-% and consequently find(diff(clusteridx)) gives splitpoint as 2,3,4.
-% We hence sort and take average on these superfluous split points.
-    splitpoint = sort(splitpoint);
-    splitpoint_ext = extendToMMultiples(splitpoint,expected_n);
-    splitpoint_reshape = reshape(splitpoint_ext,[],expected_n);
-    splitpoint = nanmean(splitpoint_reshape,1);
-end
-edges = [1,splitpoint,leny];
-else
+if numclusters > 1 && ~manually_split
+    clusteridx = kmeans(X,numclusters); 
+    splitpoint = find(diff(clusteridx)); 
+    expected_n = numclusters-1;
+    if length(splitpoint) > expected_n
+    % ideally, clusteridx should be such as 1 1 1 2 2 2...
+    % and hence we can use diff to find the splitpoint (at 3 for this case).
+    % However, sometimes it's not ideal and may gives such as 1 1 2 1 2 2...,
+    % and consequently find(diff(clusteridx)) gives splitpoint as 2,3,4.
+    % We hence sort and take average on these superfluous split points.
+        splitpoint = sort(splitpoint);
+        splitpoint_ext = extendToMMultiples(splitpoint,expected_n);
+        splitpoint_reshape = reshape(splitpoint_ext,[],expected_n);
+        splitpoint = nanmean(splitpoint_reshape,1);
+    end
+    edges = [1,splitpoint,leny];
+elseif ~manually_split
     edges = [1,leny];
+else % manually_split
+    % do nothing
 end
 
 a_b_array = NaN(numclusters,length(beta0));

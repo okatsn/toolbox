@@ -100,7 +100,7 @@ memoryLimit = results.MemoryLimit;
 
 if isequal(memoryLimit,0)
     % estimate appropriate array size to be load a time according to memory.
-    memoryLimit = limitnumel('double')*0.85;
+    memoryLimit = limitnumel('double')*0.05;
 else
     memoryLimit = round(memoryLimit); % to avoid error.
 end
@@ -113,11 +113,11 @@ if ~isequal(SaveInplace,0)
         warning("'SaveInplace' is assigned, 'smooth' has been reset to zero.")
         smooth=0;
     end
-    totalTime_j = min([totalTime,round(memoryLimit*dt,-2)]);
+    totalTime_j = min([totalTime,round(memoryLimit*dt)]);
     iter_j = ceil(totalTime/totalTime_j);
     fprintf('OutputDuration/totalTime = %.2f/%.2f \n',totalTime_j*iter_j,totalTime)
     Save2 = true;   
-       
+%% create/load matfile       
     if isfile(SaveInplace) % if file exist
 %         FileExist = true;
         fprintf("File exists. Append to '%s' \n",SaveInplace);
@@ -138,7 +138,10 @@ if ~isequal(SaveInplace,0)
         size_T = [0,0];
     end
     
-    
+%% StartPoint identify the indices where a new stochastic process is appended to the existing matfile
+% This is not necessary, was the feature for manually checking if the
+% appending is done correctly (i.e. X should be continuous, Y should'nt have a gap around any StartPoint.)
+
 %     if isfield(matf,'StartPoint') % isfield cannot work with fields of matfile
         matf.StartPoint =  [matf.StartPoint, max(size_T) +1]; % previous [StartPoint, EndPoint +1];
 %     else
@@ -198,7 +201,7 @@ end
 
 
 % permission = 'yes';
-if or(Nw>memoryLimit,m>memoryLimit)
+if or(Nw>memoryLimit+1,m>memoryLimit+1)
 %     permission = input('Large array warning, may run out of memory. Continue anyway ? [yes/no]','s');
     warning('(You should not see this) Large array warning, memory may run out. Be careful to the status of memory usage');
     pause(5);

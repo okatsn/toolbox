@@ -11,7 +11,7 @@ p = inputParser;
 rectangle_name_value_pairs = {}; %e.g. {'Curvature',0.2};
 
 addOptional(p,'Axes',gca);
-addParameter(p,'OtherProperties',rectangle_name_value_pairs);
+addParameter(p,'patchProperties',rectangle_name_value_pairs);
 addParameter(p,'Color',[0.3569, 0.7569, 0.9882]); % the C in patch(X,Y,C);
 % addParameter(p,'DrawNow',false);
 
@@ -19,7 +19,7 @@ parse(p,varargin{:});
 rslt = p.Results; 
 ax = rslt.Axes;
 % DrawNow = rslt.DrawNow;
-rectProps = rslt.OtherProperties;
+rectProps = rslt.patchProperties;
 patch_color = rslt.Color;
 
 Y_range = ax.YLim;
