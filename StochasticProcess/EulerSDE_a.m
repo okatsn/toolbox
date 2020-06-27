@@ -92,7 +92,7 @@ showInfo = results.information;
 SaveInplace = results.SaveInplace;
 TimeElapseTR = results.TimeElapse;
 constantForce = results.ConstantForce;
-Fcxdt = constantForce*dt;
+Fext_x_dt = constantForce*dt;
 % SteadyStateMean = results.SteadyStateMean;
 % function_ = results.function;
 % FrictionType = results.FrictionType; 
@@ -251,7 +251,7 @@ for k=1:m
     traceT(1)=t;    traceY(1)=y;%initial condition
         for i=2:Nw
             t=t+dt;   
-            y=y+drift(y)*dt+b*dW(i-1) + Fcxdt;           
+            y=y+drift(y)*dt+b*dW(i-1) + Fext_x_dt;           
             traceT(i)=t;  
             traceY(i)=y; %
         end
@@ -332,7 +332,7 @@ if showInfo~=0
 end
 O.smth_tag = smooth_info;
 O.mean_Y_predicted = Y_avg_predicted;
-O.ConstantForce_x_dt = Fcxdt;
+O.ConstantForce_x_dt = Fext_x_dt;
 % if ~isequal(SteadyStateMean,0)    
 %     O.mean_Y_avg_samplepath_st = 
 % end
