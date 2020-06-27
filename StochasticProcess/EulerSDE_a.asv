@@ -131,7 +131,7 @@ if ~isequal(SaveInplace,0)
         X = [];
         Y = [];
         StartPoint = [];
-        varNames = {'D','r','dt','constantForce','FrictionType','StartPoint','X','Y'};
+        varNames = {'D','r','dt','FrictionType','StartPoint','X','Y'};
         save(SaveInplace,varNames{:},'-v7.3');               
         matf = matfile(SaveInplace,'Writable',true);
         fprintf("Create new file to '%s' \n",SaveInplace);

@@ -57,9 +57,9 @@ matfileSave = rst.matfileSave;
 
 if isequal(memoryLimit,0)
     % estimate appropriate array size to be load a time according to memory.
-    memoryLimit = 0.05*limitnumel('double'); 
+    memoryLimit = limitnumel(0.0005,'double'); 
 else
-    memoryLimit = round(memoryLimit); % to avoid error.
+    memoryLimit = floor(memoryLimit); % to avoid error.
 end
 
 %%
