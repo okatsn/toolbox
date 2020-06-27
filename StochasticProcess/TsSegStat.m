@@ -311,9 +311,10 @@ end
 if checkJump
     S.checkJumpCount = checkJumpCount;
 end
-S.checkLongCount = checkLongCount;
+
 
 if checkLong
+%     S.checkLongCount = checkLongCount; % seems to be useless to be stored.
     S.NumelSegsIsNotRight = NumelSegsIsNotRight;
     if NumelSegsIsNotRight>0
         
@@ -338,7 +339,7 @@ duration_i = nan_i;
 sumY_i = nan_i;
 sumabsY_i = nan_i;
 for k = 1:NoSeg
-    seg_k = abs(time_series_in_cell{k}); % before 2020-06-09, there is no abs().
+    seg_k = time_series_in_cell{k};
     duration_i(k) = length(seg_k);% calculate duration
 %     vsquare_i(k) = sum(seg_k.^2);% calculate kinetic energy (without 0.5*mass)
 %     avgY_i(k) = mean(seg_k);% calculate mean
