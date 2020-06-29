@@ -25,7 +25,7 @@ if nargin > 0
     end
 else
     DrY0 = 10*rand(1,3).*randn(1,3);
-    ConstantForce = randn();
+    ConstantForce = abs(randn());
     dt = 1e-3;
     tempfilename = 'temp_EulerSDE.mat';
     if isfile(tempfilename)
