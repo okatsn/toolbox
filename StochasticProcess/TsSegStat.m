@@ -73,7 +73,6 @@ checkJump = false;
 checkNaN = false;
 if ismember(expectedCheck{1},Validation)
     checkLong = true;
-    NumelSegsIsNotRight = 0;
 end
 checkLongCount = 0; % must have
 
@@ -125,7 +124,7 @@ end
 
 maxlength = max(sizeT);
 maxiters = ceil(maxlength/memoryLimit);
-prev_seg_not_finished = false;
+prev_seg_tail_not_finished = false;
 this_first_seg_not_NaN = false;
 
 % fix the bug 2020-05-27
@@ -139,11 +138,11 @@ sumabsY = [];
 sumY = [];
 
 tic; H = timeLeft0(maxiters,funNm);
-for i = 1:maxiters %i = maxiters goes wrong.
+for i = 1:maxiters 
     duration_tmp = []; % for the long segment that cross more-than-one iterations.
-    sumY_tmp = [];  % if the long segment is not complete yet, 
-    sumabsY_tmp = [];     % duration_tmp  should remain empty.
-                       % unfinished duration are summed up and temporarily
+    sumY_tmp = [];     % If the long segment is not complete yet, 
+    sumabsY_tmp = [];  % duration_tmp  should remain empty.
+                       % Unfinished duration are summed up and temporarily
                        % stored in duration_tmp_1
     
 %     tY =  [1;2;4;6;8];
@@ -157,15 +156,14 @@ for i = 1:maxiters %i = maxiters goes wrong.
 %     [Y_seg,idx] = split_SDE(tY);
     [segments_all,desired,undesired] = split_by_thr(Yi,thr);
 
-    seg_last = segments_all{end};
-    seg_first = segments_all{1};
+    seg_tail = segments_all{end};
+    seg_head = segments_all{1};
     
-    if all(isnan(seg_first)) % if first segment is nan, then no need to combine with the previous one. (rarely happen)
+    if all(isnan(seg_head)) % if first segment is nan, then no need to combine with the previous one. (rarely happen)
         % all is faster than any
         this_first_seg_not_NaN = false;
-        if prev_seg_not_finished
-%             desired = [{previous_last_seg};desired]; % restore the previous deleted one to this iter.
-            warning('%s [RARE EVENT!] Restore the previous deleted one to this iter.',funNm);
+        if prev_seg_tail_not_finished
+            warning("%s [RARE EVENT!] (You shouldn't see this frequently) Restore the previous deleted one to this iter.",funNm);
         end
     else
         this_first_seg_not_NaN = true;
@@ -173,17 +171,17 @@ for i = 1:maxiters %i = maxiters goes wrong.
     
     no_undesired = isempty(undesired);
     
-    if prev_seg_not_finished && this_first_seg_not_NaN
-        
+    if prev_seg_tail_not_finished && this_first_seg_not_NaN
+
 %             previous_last_seg = [previous_last_seg; desired{1}]; 
             
         [duration_tmp_2,sumY_tmp_2,sumabsY_tmp_2] = calc_stat(desired(1),false);
         % duration_tmp_1 is created in the previous loop if
         % the last segment in previous loop is not finished.
 
-        duration_tmp_1 = duration_tmp_1 + duration_tmp_2;
-        sumY_tmp_1 = sumY_tmp_1 + sumY_tmp_2;
-        sumabsY_tmp_1 = sumabsY_tmp_1 + sumabsY_tmp_2;
+        duration_tmp_part = duration_tmp_part + duration_tmp_2;
+        sumY_tmp_part = sumY_tmp_part + sumY_tmp_2;
+        sumabsY_tmp_part = sumabsY_tmp_part + sumabsY_tmp_2;
 
 
         if checkLong &&  i >= maxiters/2
@@ -197,14 +195,15 @@ for i = 1:maxiters %i = maxiters goes wrong.
         end
         if no_undesired % still not finished (only one desired = all datapoints are desired in this session)    
             if checkLong && length(segments_all)>1 
-                warning([tlt2,'. Also, numel seg is not right.']);
-                NumelSegsIsNotRight = NumelSegsIsNotRight+1;
+                
+                error([tlt2,'. Error: numel seg is not right.']);
+                
             end
-            continue  % ONLY 1 segment: very probably the this segment is not completed yet.
+            continue  % ONLY 1 segment: very probably this segment is not completed yet.
         else % previous long time series terminates in this loop
-            duration_tmp = duration_tmp_1;
-            sumY_tmp = sumY_tmp_1;
-            sumabsY_tmp = sumabsY_tmp_1;
+            duration_tmp = duration_tmp_part;
+            sumY_tmp = sumY_tmp_part;
+            sumabsY_tmp = sumabsY_tmp_part;
             desired(1) = []; % remove the 1st segment since it has been taken into accounted.
             checkLongCount = checkLongCount+1;
         end        
@@ -227,25 +226,30 @@ for i = 1:maxiters %i = maxiters goes wrong.
     end
 
     %
-    if all(isnan(seg_last))% all is faster than any
-        prev_seg_not_finished = false; % segment finished.
+    if all(isnan(seg_tail))% (all is faster than any)
+        prev_seg_tail_not_finished = false; 
+        % (for the next loop) the last segment in previous loop is finished.
         
-        sumY_tmp_1 = 0;  % this is unnecessary
-        sumabsY_tmp_1 = 0;     % this is unnecessary
-        duration_tmp_1 = 0; % this is unnecessary since 
+        sumY_tmp_part = 0;  % this is unnecessary
+        sumabsY_tmp_part = 0;     % this is unnecessary
+        duration_tmp_part = 0; % this is unnecessary since 
                             % duration_tmp_1 = duration_tmp_1 + duration_tmp_2
                             % can be reached only if prev_seg_not_finished is true.
     else % segment not finished.
+        if checkLong && ~prev_seg_tail_not_finished && ~isempty(duration_tmp)
+            error("previous last (tail) segment all nan (event completed), hence duration_tmp should be empty, but it's not.");
+            % this check seems to be superfluous
+        end
         % if the i-1th seg_last is not all nan (which means it's not finished yet)
-        prev_seg_not_finished = true; % save and pass the last unfinished segment to next iteration.
+        prev_seg_tail_not_finished = true; % save and pass the last unfinished segment to next iteration.
 %         previous_last_seg = seg_last;       
-        [duration_tmp_1,sumY_tmp_1,sumabsY_tmp_1,~] = calc_stat({seg_last},false);
+        [duration_tmp_part,sumY_tmp_part,sumabsY_tmp_part,~] = calc_stat({seg_tail},false);
+        % calculate the duration of unfinished segment (seg_tail) that will
+        % be passed to the next loop.
         desired(end) = []; 
         % temporarily save the duration of the incompleted time series as duration_tmp_1, 
         % and delete the incompleted one that it won't be counted as duration_i.
-        if checkLong && ~isempty(duration_tmp)
-            error("last segment unfinished hence duration_tmp should be empty, but its not.");
-        end
+
     end
     %      TsAnimation(cell2mat(desired),'WindowWidth',100);
 
@@ -311,23 +315,6 @@ end
 if checkJump
     S.checkJumpCount = checkJumpCount;
 end
-
-
-if checkLong
-%     S.checkLongCount = checkLongCount; % seems to be useless to be stored.
-    S.NumelSegsIsNotRight = NumelSegsIsNotRight;
-    if NumelSegsIsNotRight>0
-        
-        if issaveasmatfile
-            relatedfilename = matfileSave;
-        else
-            relatedfilename = matfile1;
-        end
-        warning('checkLong not past (error: %d)\n (%s)',NumelSegsIsNotRight,relatedfilename);
-    end
-end
-
-
 
 end
 
