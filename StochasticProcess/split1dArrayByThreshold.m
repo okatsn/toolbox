@@ -1,18 +1,23 @@
-function [C,desired_ind,undesired_ind] = split1dArrayByThreshold(Y_i,thr)
-% split the input time series by a certain threshold thr.
-% [C,desired_ind,undesired_ind] = split1dArrayByThreshold(Y_i,thr)
-%     - desired: the segments where Y>thr.
-%     - undesired: the segments where Y<thr, the data are all replaced by NaN.
-%     - desired_segments = C(desired_ind);
-%     - undesired_segments = C(undesired_ind);
-
-errorStruct.identifier = 'Custom:Error';
-
-% if le(thr,0) %thr<=0
-% %     errorStruct.message = 'Threshold (2nd argument) cannot be zero.';
-% %     error(errorStruct);
-%     warning('Threshold is zero. If input timeseries is all positive, then this function do nothing (no split at all).')
-% end
+function [C,outside_thr_ind,inside_thr_ind,varargout] = split1dArrayByThreshold(Y_i,thr)
+% split the input time series Yi by a certain threshold thr.
+% output arguments 1 to 3:
+%     [C,outside_thr_ind,inside_thr_ind] = split1dArrayByThreshold(Y_i,thr)
+%         - 'inside_thr': Y<thr, or Y>thr(1) && Y<thr(2)
+%         - 'outside_thr': Y>thr, or Y<thr(1) && Y>thr(2)
+%         - outside_thr_segments: the segments satisfying the 'outside_thr' criterion.
+%             - outside_thr_segments = C(outside_thr_ind);
+%         - inside_thr_segments: the segments satisfying the 'inside_thr' criterion.
+%             - inside_thr_segments = C(inside_thr_ind);
+% 
+% output arguments 4:
+%     [~,~,~,durations] = split1dArrayByThreshold(Y_i,thr)
+%         - durations_Y_outside = durations(outside_thr_ind);
+%         - durations_Y_inside = durations(inside_thr_ind);
+% 
+% output arguments 5 to 6:
+%     [~,~,~,~,Y_outside_ind,Y_inside_ind] = split1dArrayByThreshold(Y_i,thr)
+%         - Y_outside = Yi(Y_outside_ind);
+%         - Y_inside = Yi(Y_inside_ind);
 
 Y = Y_i(:); % to make sure Y is N by 1.
 Y2 = Y;
@@ -48,13 +53,29 @@ lenC = length(durations);
 firstseg = C{1};
 if all(isnan(firstseg)) || isempty(firstseg) % all is faster than any
     % NaN and non-NaN segments should occur in turn.
-    % Hence if firstseg is all nan, then 1:2:end indicates the undesired
+    % Hence if firstseg is all nan, then 1:2:end indicates the inside_thr
     % segments.
-    desired_ind = 2:2:lenC;
-    undesired_ind = 1:2:lenC;
+    outside_thr_ind = 2:2:lenC;
+    inside_thr_ind = 1:2:lenC;
 else % first segment is not nan or empty
-    desired_ind = 1:2:lenC;
-    undesired_ind = 2:2:lenC;
+    outside_thr_ind = 1:2:lenC;
+    inside_thr_ind = 2:2:lenC;
+end
+
+if nargout > 3 % 4th output argument
+    varargout{1} = durations;
+    
+    if nargin > 4 % 5th argument
+        id1s = csum(durations);
+        id0s = [1;id1s(1:end - 1)+1];
+        Y_outside_ind = julialikerange(id0s(outside_thr_ind),id1s(outside_thr_ind));
+        varargout{2} = Y_outside_ind;
+        if nargin > 5 % 6th argument
+            Y_inside_ind = julialikerange(id0s(inside_thr_ind),id1s(inside_thr_ind));
+            varargout{3} = Y_inside_ind;
+        end
+        
+    end
 end
 
 % https://www.mathworks.com/matlabcentral/answers/335333-split-array-into-separate-arrays-at-row-with-nans
