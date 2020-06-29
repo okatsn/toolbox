@@ -18,7 +18,12 @@ function [C,outside_thr_ind,inside_thr_ind,varargout] = split1dArrayByThreshold(
 %     [~,~,~,~,Y_outside_ind,Y_inside_ind] = split1dArrayByThreshold(Y_i,thr)
 %         - Y_outside = Yi(Y_outside_ind);
 %         - Y_inside = Yi(Y_inside_ind);
-
+%     try this:
+%         O = EulerSDE_a(D,r,100);
+%         [~,~,~,~,Youtind,Yinind] = split1dArrayByThreshold(O.Y,[-1,1]);
+%         figure; plot(O.X(Youtind),O.Y(Youtind),'*'); hold on; plot(O.X(Yinind),O.Y(Yinind),'o')
+    
+    
 Y = Y_i(:); % to make sure Y is N by 1.
 Y2 = Y;
 
@@ -51,7 +56,7 @@ C = mat2cell(Y,durations(:),sizeY_dim2);
 lenC = length(durations);
 
 firstseg = C{1};
-if all(isnan(firstseg)) || isempty(firstseg) % all is faster than any
+if isnan(Y2(1)) || isempty(firstseg) % all is faster than any
     % NaN and non-NaN segments should occur in turn.
     % Hence if firstseg is all nan, then 1:2:end indicates the inside_thr
     % segments.
@@ -65,12 +70,12 @@ end
 if nargout > 3 % 4th output argument
     varargout{1} = durations;
     
-    if nargin > 4 % 5th argument
+    if nargout > 4 % 5th argument
         id1s = csum(durations);
         id0s = [1;id1s(1:end - 1)+1];
         Y_outside_ind = julialikerange(id0s(outside_thr_ind),id1s(outside_thr_ind));
         varargout{2} = Y_outside_ind;
-        if nargin > 5 % 6th argument
+        if nargout > 5 % 6th argument
             Y_inside_ind = julialikerange(id0s(inside_thr_ind),id1s(inside_thr_ind));
             varargout{3} = Y_inside_ind;
         end
