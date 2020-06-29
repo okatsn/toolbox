@@ -1,8 +1,10 @@
-function [C,varargout] = split_by_thr(Y_i,thr)
+function [C,desired_ind,undesired_ind] = split1dArrayByThreshold(Y_i,thr)
 % split the input time series by a certain threshold thr.
-% [segments_all,desired,undesired] = split_by_thr(Y_i,threshold)
+% [C,desired_ind,undesired_ind] = split1dArrayByThreshold(Y_i,thr)
 %     - desired: the segments where Y>thr.
 %     - undesired: the segments where Y<thr, the data are all replaced by NaN.
+%     - desired_segments = C(desired_ind);
+%     - undesired_segments = C(undesired_ind);
 
 errorStruct.identifier = 'Custom:Error';
 
@@ -27,7 +29,7 @@ end
 
 id_nan = isnan(Y2);
 notNaN = ~id_nan;
-
+sizeY_dim2 = size(Y,2);
 id_nansplit = diff(id_nan); % indicates the midpoints that separate NaN and non-NaN elements.
 id_cross = adjMultiply(Y2) < 0; % indicates the midpoints where Y(i)*Y(i - 1) are negative.
 % ... that is, Y transits from positive to negative, or vice versa.
@@ -40,38 +42,20 @@ edges = find(id_split_ext); % the edges/boundaries for segments.
 id_nonansplit_ext = [0;id_nonansplit;0];
 edges2 = sort([edges; find(id_nonansplit_ext)]);
 durations = diff(edges2); % the duration/numel of each segment.
-C = mat2cell(Y2,durations(:),size(Y2,2));
+C = mat2cell(Y,durations(:),sizeY_dim2);
+lenC = length(durations);
 
-
-if nargout>1
-    firstseg = C{1};
-    if all(isnan(firstseg)) || isempty(firstseg) % all is faster than any
-        desired_segment = C(2:2:end);
-        undesired_segment = C(1:2:end);
-    else
-        desired_segment = C(1:2:end);
-        undesired_segment = C(2:2:end);
-    end
-    
-    varargout{1} = desired_segment;%
-    if nargout>2
-        varargout{2} = undesired_segment;
-        
-        if nargout>3
-            undesired_segment_combined = cell2mat(undesired_segment);
-            validation = all(isnan(undesired_segment_combined));
-            varargout{3} = validation;
-            if ~validation
-                error('Split failed. The undesired segments should be all NaN, but it is not.');
-            else
-                disp('Time series split_by_thr validated.');
-            end
-        end
-        
-    end
-    
+firstseg = C{1};
+if all(isnan(firstseg)) || isempty(firstseg) % all is faster than any
+    % NaN and non-NaN segments should occur in turn.
+    % Hence if firstseg is all nan, then 1:2:end indicates the undesired
+    % segments.
+    desired_ind = 2:2:lenC;
+    undesired_ind = 1:2:lenC;
+else % first segment is not nan or empty
+    desired_ind = 1:2:lenC;
+    undesired_ind = 2:2:lenC;
 end
-
 
 % https://www.mathworks.com/matlabcentral/answers/335333-split-array-into-separate-arrays-at-row-with-nans
 %% test example
