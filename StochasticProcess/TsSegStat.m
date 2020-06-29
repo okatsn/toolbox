@@ -267,22 +267,24 @@ for i = 1:maxiters
     if issaveasmatfile
         len_S_tmp = length(duration);
         if len_S_tmp > memoryLimit || i == maxiters % then save to matfile
-%             if S_id0 == 1 
-%                 S.duration = duration;
-%                 S.sumY = sumY;
-%                 S.sumabsY = sumabsY;
-%                 S_id0 = len_S_tmp + S_id0; % next index
-%             else
-                len_S = size(S,'duration',1);
-                S_id0 = len_S + 1;
-                S_id1 = len_S + len_S_tmp;
-                S.duration(S_id0:S_id1,1) = duration;
-                S.sumY(S_id0:S_id1,1) = sumY;
-                S.sumabsY(S_id0:S_id1,1) = sumabsY;                
-%             end
-            duration = [];
-            sumY = [];
-            sumabsY = []; % and release the memory.
+            len_S = size(S,'duration',1);
+            S_id0 = len_S + 1;
+            S_id1 = len_S + len_S_tmp;
+            indS = S_id0:S_id1;
+            if ~isempty(indS)
+                % matfile does not support index to be empty
+                % indS is empty only if length(duration) is zero
+                S.duration(indS,1) = duration;    
+                S.sumY(indS,1) = sumY;
+                S.sumabsY(indS,1) = sumabsY;                
+                duration = [];
+                sumY = [];
+                sumabsY = []; % and release the memory.
+            else
+                % if length(duration) is zero, then there's no need to
+                % write anything to matfile. 
+            end
+
         end
     end
     [H] = timeLeft1(toc,i,H);
