@@ -1,7 +1,7 @@
-function [S] = TsSegStat(matfile1,varargin)
+function [S] = splitted1dArrayStatistics(matfile1,varargin)
 % How to use:
 %     mtf = matfile('a_matfile_store_timeseries_Y.mat');
-%     S = TsSegStat(mtf); % field name 'Y' must exist.
+%     S = splitted1dArrayStatistics(mtf); % field name 'Y' must exist.
 % - Calculate statistics of every segments from Time series stored in matfile.
 % - The timeseries (t,v)  is read from matfile in batches for memory reason.
 % - A segment is defined as the interval between two nearest adjacent points 
@@ -31,27 +31,24 @@ function [S] = TsSegStat(matfile1,varargin)
 %         - normally, NaN never occurred.
 % 
 % Dependency: 
-% - split_by_thr.m
-% 
-% Last modify: Hsi 2020-05-27
+% - split1dArrayByThreshold.m
 
-funNm = '[TsSegStat]';
-
-expectedCheck = {'CheckLong','CheckJump','CheckNaN'}; % order must right
+funNm = '[splitted1dArrayStatistics]';
+% expectedCheck = {'CheckLong'}; % order must right
 % valid_ck = @(x) any(validatestring(x,expectedCheck));
 
 p = inputParser;
 addParameter(p,'MemoryLimit',0);
 addParameter(p,'Threshold',0.01);
-addParameter(p,'Validation',0);
+addParameter(p,'Validation',{});
 addParameter(p,'matfileSave',0);
-addParameter(p,'DataFit',0);
+% addParameter(p,'DataFit',0);
 parse(p,varargin{:});
 rst = p.Results;
 memoryLimit = rst.MemoryLimit;
 thr = rst.Threshold;
 Validation = rst.Validation;
-FitType = rst.DataFit;
+% FitType = rst.DataFit;
 matfileSave = rst.matfileSave;
 
 
@@ -63,26 +60,11 @@ else
 end
 
 %%
-if isequal(FitType,0)
-    do_fit = false;
-else
-    do_fit = true;
-end
 checkLong = false;
-checkJump = false;
-checkNaN = false;
-if ismember(expectedCheck{1},Validation)
+
+
+if any(ismember({'CheckLong','checkLong'},Validation))
     checkLong = true;
-end
-checkLongCount = 0; % must have
-
-if ismember(expectedCheck{2},Validation)
-    checkJump = true;
-    checkJumpCount = 0;
-end
-
-if ismember(expectedCheck{3},Validation)
-    checkNaN = true;
 end
 
 fprintf('%s Cut-off threshold: %.6f \n',funNm,thr);
@@ -95,7 +77,7 @@ if issaveasmatfile
     if ischar(matfileSave) || isStringScalar(matfileSave)
         if isfile(matfileSave)
             matfileSave = pathnonrepeat(matfileSave);
-            disp('[TsSegStat] Matfile for S exist, create a new file.');
+            disp('[splitted1dArrayStatistics] Matfile for S exist, create a new file.');
         end
     else
         matfileSave = pathnonrepeat('temp.mat');
@@ -105,27 +87,28 @@ if issaveasmatfile
     if ~S.Properties.Writable
         error('S.Properties.Writable is false. This should not happen.');
     end
-    S.duration = [];
-    S.sumY = [];
-    S.sumabsY = [];
 
 else
     S = struct();    
 end
 
+[columnNames] = calc_stat();
+lennames = length(columnNames);
+for i = 1:lennames
+    S.(columnNames{i}) = [];
+end
+
 try
     [outputTable] = matfileWhos(matfile1); % information of the input timeseries
     S.Info = outputTable;
-catch ME
+catch
     warning('Failed in matfileWhos. There will be no information of this matfile.');
 end
 
-
-
 maxlength = max(sizeT);
 maxiters = ceil(maxlength/memoryLimit);
-prev_seg_tail_not_finished = false;
-this_first_seg_not_NaN = false;
+prev_seg_tail_not_finished = false; % the last segment in the previous iteration is not falled inside threshold yet.
+this_first_seg_is_outside = false; % the first segment in this iteration is outside threshold.
 
 % fix the bug 2020-05-27
 % id0 = 1;
@@ -133,153 +116,139 @@ this_first_seg_not_NaN = false;
 id0 = 1 - memoryLimit;
 id1 = 1;
 
-duration = [];
-sumabsY = [];
-sumY = [];
+stats = [];
+
+
 
 tic; H = timeLeft0(maxiters,funNm);
 for i = 1:maxiters 
-    duration_tmp = []; % for the long segment that cross more-than-one iterations.
-    sumY_tmp = [];     % If the long segment is not complete yet, 
-    sumabsY_tmp = [];  % duration_tmp  should remain empty.
-                       % Unfinished duration are summed up and temporarily
-                       % stored in duration_tmp_1
+
+    stats_tmp_f = [];
+    % for the long segment that cross more-than-one iterations.
+    % If the long segment is not complete yet, 
+    % duration_tmp should remain empty.
+    % Unfinished duration are summed up and temporarily
+    % stored in stats_tmp_part
     
-%     tY =  [1;2;4;6;8];
     id0 = id0+memoryLimit;
     id1 = min([id1 + memoryLimit, maxlength]);
     if id0>=id1 % then it will return empty indices that will cause error. In fact previous loop is the last loop.
         fprintf('[%s] Previous loop is the last loop. Iteration i = %d break.\n',funNm,i);
         break
     end
-        Yi = matfile1.Y(id0:id1,1);
-%     [Y_seg,idx] = split_SDE(tY);
-    [segments_all,desired,undesired] = split_by_thr(Yi,thr);
+    Yi = matfile1.Y(id0:id1,1);
+    [segments_all,outside_id,inside_id,durations_all] = split1dArrayByThreshold(Yi,thr);
+    % Segments_all(outside_id) is segs_outside,
+    % segments_all(inside_id) is segs_inside.
+    % As follow:
+    %    segs_outside = segments_all(outside_id);
+    %    segs_inside = segments_all(inside_id);
 
-    seg_tail = segments_all{end};
-    seg_head = segments_all{1};
+    no_inside = isempty(inside_id);
+    % no value falls below/inside the threshold in this iteration. 
+    no_outside = isempty(outside_id);
+    % all values are below/inside the threshold in this iteration. 
     
-    if all(isnan(seg_head)) % if first segment is nan, then no need to combine with the previous one. (rarely happen)
-        % all is faster than any
-        this_first_seg_not_NaN = false;
+    if no_outside || outside_id(1) ~= 1 % this-first-segment is not outside.
+        % outside_id can be either 1:2:end or 2:2:end,
+        % hence, outside_id(1) == 1 means the 1st segment is outside
+        % threshold.
+        this_first_seg_is_outside = false;
         if prev_seg_tail_not_finished
             warning("%s [RARE EVENT!] (You shouldn't see this frequently) Restore the previous deleted one to this iter.",funNm);
         end
-    else
-        this_first_seg_not_NaN = true;
+    else % outside_id(1) == 1
+        this_first_seg_is_outside = true;
     end
     
-    no_undesired = isempty(undesired);
+
     
-    if prev_seg_tail_not_finished && this_first_seg_not_NaN
-
-%             previous_last_seg = [previous_last_seg; desired{1}]; 
-            
-        [duration_tmp_2,sumY_tmp_2,sumabsY_tmp_2] = calc_stat(desired(1),false);
-        % duration_tmp_1 is created in the previous loop if
+    if prev_seg_tail_not_finished && this_first_seg_is_outside
+           
+        [stats_tmp2] = calc_stat(segments_all,outside_id(1),durations_all);
+        % stats_tmp2 is 1 by 3, the statistics of the first segment 
+        % (which must be the continuation of the last incompleted one).
+        % To calculate statistics of segments inside the threshold, change
+        % outside_id into inside_id, as follow:
+        %   [stats_tmp2] = calc_stat(segments_all,inside_id,durations_all);
+          
+        stats_tmp_part = stats_tmp_part + stats_tmp2;
+        % stats_tmp_part is created in the previous loop if
         % the last segment in previous loop is not finished.
-
-        duration_tmp_part = duration_tmp_part + duration_tmp_2;
-        sumY_tmp_part = sumY_tmp_part + sumY_tmp_2;
-        sumabsY_tmp_part = sumabsY_tmp_part + sumabsY_tmp_2;
-
-
-        if checkLong &&  i >= maxiters/2
-            if checkLongCount<12
-                figure;
-                plot(segments_all{1});
-                tlt2 = 'Long process that keeps going in this loop';
-                title(tlt2);
-                drawnow;
-            end
-        end
-        if no_undesired % still not finished (only one desired = all datapoints are desired in this session)    
+        outside_id(1) = []; 
+        % remove the 1st segment since it has been taken into accounted
+        % in stats_tmp2.
+        if no_inside 
+            % prev_seg_tail_not_finished && this_first_seg_is_outside 
+            % && no_inside:
+            % That is, previous event still incomplete until the end of
+            % this session (only one outside = all datapoints are outside).
+            % (PS: 'incomplete' means the process do not fall 'inside' yet)
             if checkLong && length(segments_all)>1 
-                
+                tlt2 = 'Long process that keeps going in this loop';
                 error([tlt2,'. Error: numel seg is not right.']);
-                
             end
-            continue  % ONLY 1 segment: very probably this segment is not completed yet.
+            continue  
+            % ONLY 1 segment: very probably this segment is not completed yet.
+            % stats_tmp_part are passed into next iteration
         else % previous long time series terminates in this loop
-            duration_tmp = duration_tmp_part;
-            sumY_tmp = sumY_tmp_part;
-            sumabsY_tmp = sumabsY_tmp_part;
-            desired(1) = []; % remove the 1st segment since it has been taken into accounted.
-            checkLongCount = checkLongCount+1;
+            stats_tmp_f = stats_tmp_part;
+            % if prev_seg_not_finished && this_first_seg_is_outside...
+            % && previous long timeseries terminates in this loop,
+            % stats_tmp_f is the statistics of the finished long timeseries
+            % that cross two loops.
         end        
     end
     
-    if checkJump
-        for k = 1:length(desired)
-            if any(diff(desired{k})>1)
-                warning('%s Combined error, index %d:%d',funNm,id0,id1);
-                checkJumpCount = checkJumpCount+1;
-                if checkJumpCount<5
-                    figure;
-                    title(sprintf('%s Combined error, index %d:%d',funNm,id0,id1));
-                    plot(desired{k});
-                    drawnow;
-                end
-%                 pause;
-            end
+    try
+        prev_seg_tail_not_finished = no_inside || outside_id(end) > inside_id(end);
+        % True if the last segment (tail) in this iteration is outside 
+        % thresholds, i.e. incompleted/unfinished.
+    catch ME
+        if strcmp(ME.identifier,'MATLAB:badsubscript')
+        % outside_id isempty, hence error occurred.
+        prev_seg_tail_not_finished = false; 
+        % (for the next loop) This 
+        % indicates the last segment in the previous loop is completed.
+        else 
+            rethrow(ME);
         end
     end
-
-    %
-    if all(isnan(seg_tail))% (all is faster than any)
-        prev_seg_tail_not_finished = false; 
-        % (for the next loop) the last segment in previous loop is finished.
-        
-        sumY_tmp_part = 0;  % this is unnecessary
-        sumabsY_tmp_part = 0;     % this is unnecessary
-        duration_tmp_part = 0; % this is unnecessary since 
-                            % duration_tmp_1 = duration_tmp_1 + duration_tmp_2
-                            % can be reached only if prev_seg_not_finished is true.
-    else % segment not finished.
-        if checkLong && ~prev_seg_tail_not_finished && ~isempty(duration_tmp)
-            error("previous last (tail) segment all nan (event completed), hence duration_tmp should be empty, but it's not.");
-            % this check seems to be superfluous
-        end
+    
+    if  prev_seg_tail_not_finished       
         % if the i-1th seg_last is not all nan (which means it's not finished yet)
-        prev_seg_tail_not_finished = true; % save and pass the last unfinished segment to next iteration.
-%         previous_last_seg = seg_last;       
-        [duration_tmp_part,sumY_tmp_part,sumabsY_tmp_part,~] = calc_stat({seg_tail},false);
+        % save and pass the last unfinished segment to next iteration.
+        [stats_tmp_part] = calc_stat(segments_all,outside_id(end),durations_all);
         % calculate the duration of unfinished segment (seg_tail) that will
         % be passed to the next loop.
-        desired(end) = []; 
+        outside_id(end) = []; % this is required
         % temporarily save the duration of the incompleted time series as duration_tmp_1, 
         % and delete the incompleted one that it won't be counted as duration_i.
-
+    else % tail segment is incomplete in previous iteration
+        stats_tmp_part = []; % this is unnecessary since
+                             % stats_tmp_part = stats_tmp_part + stats_tmp2
+                             % can be reached only if prev_seg_not_finished is true.
     end
-    %      TsAnimation(cell2mat(desired),'WindowWidth',100);
 
-    % Calculate statistics   
-    [duration_i,sumY_i,sumabsY_i] = calc_stat(desired,do_fit);
-    
-    % if prev_seg_not_finished && this_first_seg_not_NaN...
-    % && previous long timeseries terminates in this loop,
-    % duration_tmp is the duration of the long timeseries that cross loops.
-    % Otherwise, it is empty.
-    duration = [duration;duration_tmp;duration_i]; 
-    sumY = [sumY;sumY_tmp;sumY_i];
-    sumabsY = [sumabsY;sumabsY_tmp;sumabsY_i];
+    % Calculate statistics of this iteration
+    [stats_i] = calc_stat(segments_all,outside_id,durations_all);
+    stats = [stats;stats_tmp_f;stats_i];
     
     if issaveasmatfile
-        len_S_tmp = length(duration);
+        len_S_tmp = size(stats,1);
         if len_S_tmp > memoryLimit || i == maxiters % then save to matfile
-            len_S = size(S,'duration',1);
+            len_S = size(S,columnNames{1},1);
             S_id0 = len_S + 1;
             S_id1 = len_S + len_S_tmp;
             indS = S_id0:S_id1;
             if ~isempty(indS)
                 % matfile does not support index to be empty
                 % indS is empty only if length(duration) is zero
-                S.duration(indS,1) = duration;    
-                S.sumY(indS,1) = sumY;
-                S.sumabsY(indS,1) = sumabsY;                
-                duration = [];
-                sumY = [];
-                sumabsY = []; % and release the memory.
+                for nmi = 1:lennames
+                    colname_i = columnNames{nmi};
+                    S.(colname_i)(indS,1) = stats(:,nmi);
+                end           
+                stats = []; % and release the memory.
             else
                 % if length(duration) is zero, then there's no need to
                 % write anything to matfile. 
@@ -292,61 +261,48 @@ end
 delete(H.waitbarHandle);
 
 if ~issaveasmatfile
-    S.duration = duration;
-    S.sumY = sumY;
-    S.sumabsY = sumabsY;
+    for nmi = 1:lennames
+        colname_i = columnNames{nmi};
+        S.(colname_i) = stats(:,nmi);
+    end
 else
     % do nothing, since the variables already saved.
 end
 
 S.threshold = thr;
 
-
-if checkNaN
-    try
-        S.checkNaN = 'NaN check passed.';
-        if any(isnan(duration))||any(isnan(sumY))||any(isnan(sumabsY))
-            S.checkNaN = 'NaN check NOT passed.';
-        end
-    catch
-        S.checkNaN = 'NaN check NOT passed.';
-    end
-    
 end
 
-if checkJump
-    S.checkJumpCount = checkJumpCount;
+function [stats_output] = calc_stat(segments_all,target_id,durations_all)
+% [stats_outside] = calc_stat(segments_all,outside_id,durations_all)
+% [stats_inside] = calc_stat(segments_all,inside_id,durations_all)
+% [columnNames] = calc_stat()
+funcs = {''            ,@(seg_k) sum(abs(seg_k)),@(seg_k) sum(seg_k)};
+funcNames = {'duration','sumabsY'               ,'sumY'};
+
+if nargin == 0
+   stats_output = funcNames;
+   return
 end
 
-end
+width_stat = length(funcNames);% number of statistics to be calculated
 
-function [duration_i,sumY_i,sumabsY_i,NoSeg] = calc_stat(time_series_in_cell,do_fit)
-NoSeg = length(time_series_in_cell);
+NoSeg = length(target_id);
+stats_output = NaN(NoSeg,width_stat);
 
-nan_i = NaN(NoSeg,1);
-duration_i = nan_i;
-sumY_i = nan_i;
-sumabsY_i = nan_i;
-for k = 1:NoSeg
-    seg_k = time_series_in_cell{k};
-    duration_i(k) = length(seg_k);% calculate duration
-%     vsquare_i(k) = sum(seg_k.^2);% calculate kinetic energy (without 0.5*mass)
-%     avgY_i(k) = mean(seg_k);% calculate mean
-    sumabsY_i(k) = sum(abs(seg_k)); % calculate sum(v.*dt)
-    sumY_i(k) = sum(seg_k);% calculate the sum of velocity
-    if do_fit && duration_i(k)>1e4
-        [CCDF,umax,u] = calc_CCDF(seg_k);
-        DF1 = DataFit(u,CCDF,'TEX(CCDF)','umax',umax);
-        DF2 = DataFit(u,CCDF,'EXP(CCDF)');
-        figure;
-        DataFitPlot(u,CCDF,{DF1,DF2},'YScale','log',...
-            'Legend',{'data',sprintf('TEX with u_c = %.2f',DF1.best_fit_coeff),'EXP'},...
-            'XLabel','Y','YLabel','CCDF(Y)'); 
-        figure;
-        plot(seg_k);
-        xlabel('t'); ylabel('y');
-        drawnow;
+% the first statistics is the durations
+stats_output(:,1) = durations_all(target_id);
+
+for k = target_id
+    seg_k = segments_all{k};
+%     duration_i(k) = length(seg_k);% calculate duration
+    for i = 2:width_stat 
+        func_i = funcs{i};
+        stats_output(:,i) = func_i(seg_k);
+%         This will do tasks like:
+%             stats(:,2) = sum(abs(seg_k)); % calculate sum(v.*dt)
+%             stats(:,3) = sum(seg_k);% calculate the sum of velocity
     end
 end
-    
 end
+
