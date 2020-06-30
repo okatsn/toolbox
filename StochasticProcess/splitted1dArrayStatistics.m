@@ -54,7 +54,7 @@ matfileSave = rst.matfileSave;
 
 if isequal(memoryLimit,0)
     % estimate appropriate array size to be load a time according to memory.
-    memoryLimit = limitnumel(0.0005,'double'); 
+    memoryLimit = limitnumel(0.0008,'double'); 
 else
     memoryLimit = floor(memoryLimit); % to avoid error.
 end
@@ -172,7 +172,7 @@ for i = 1:maxiters
         % outside_id into inside_id, as follow:
         %   [stats_tmp2] = calc_stat(segments_all,inside_id,durations_all);
           
-        stats_tmp_part = stats_tmp_part + stats_tmp2;
+        stats_tmp_part = [stats_tmp_part; stats_tmp2];
         % stats_tmp_part is created in the previous loop if
         % the last segment in previous loop is not finished.
         outside_id(1) = []; 
@@ -192,7 +192,7 @@ for i = 1:maxiters
             % ONLY 1 segment: very probably this segment is not completed yet.
             % stats_tmp_part are passed into next iteration
         else % previous long time series terminates in this loop
-            stats_tmp_f = stats_tmp_part;
+            stats_tmp_f = finalize_stats_tmp(stats_tmp_part);
             % if prev_seg_not_finished && this_first_seg_is_outside...
             % && previous long timeseries terminates in this loop,
             % stats_tmp_f is the statistics of the finished long timeseries
@@ -273,12 +273,27 @@ S.threshold = thr;
 
 end
 
+function stats_tmp_f = finalize_stats_tmp(stats_tmp_part)
+    finalize_funcs = {@(x) sum(x), @(x) sum(x), @(x) max(x)};
+    lenffunc = length(finalize_funcs);
+    if lenffunc ~= size(stats_tmp_part,2)
+        error("The number of functions in finalize_stats_tmp should be identical number as those in calc_stat.");
+    end
+    stats_tmp_f = NaN(1,lenffunc);
+    for i = 1:lenffunc
+        array1d_i = stats_tmp_part(:,i);
+        func_i = finalize_funcs{i};
+        stats_tmp_f(i) = func_i(array1d_i);        
+    end
+
+end
+
 function [stats_output] = calc_stat(segments_all,target_id,durations_all)
 % [stats_outside] = calc_stat(segments_all,outside_id,durations_all)
 % [stats_inside] = calc_stat(segments_all,inside_id,durations_all)
 % [columnNames] = calc_stat()
-funcs = {''            ,@(seg_k) sum(abs(seg_k)),@(seg_k) sum(seg_k)};
-funcNames = {'duration','sumabsY'               ,'sumY'};
+funcs = {@(seg_k) length(seg_k) ,@(seg_k) sum(abs(seg_k)),@(seg_k) max(seg_k)};
+funcNames = {'duration'         ,'sumabsY'               ,'maxY'};
 
 if nargin == 0
    stats_output = funcNames;
@@ -292,13 +307,14 @@ stats_output = NaN(NoSeg,width_stat);
 
 % the first statistics is the durations
 stats_output(:,1) = durations_all(target_id);
-
-for k = target_id
-    seg_k = segments_all{k};
+for k = 1:NoSeg
+% for k = target_id
+    ind_k = target_id(k);
+    seg_k = segments_all{ind_k};
 %     duration_i(k) = length(seg_k);% calculate duration
     for i = 2:width_stat 
         func_i = funcs{i};
-        stats_output(:,i) = func_i(seg_k);
+        stats_output(k,i) = func_i(seg_k);
 %         This will do tasks like:
 %             stats(:,2) = sum(abs(seg_k)); % calculate sum(v.*dt)
 %             stats(:,3) = sum(seg_k);% calculate the sum of velocity
