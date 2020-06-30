@@ -54,7 +54,7 @@ leny =length(y);
 [ys, ind2sorted] = sort(y); % y(ind2sorted) = ys.
 ccdfYs = ccdfY(ind2sorted);
 %% this section is superfluous and can be delete in the future.
-if ys ~= y || ccdfYs ~= ccdfY
+if ~isequal(ys,y) || ~isequal(ccdfYs ~= ccdfY)
     disp('y and Y is sorted before nlinfit.')
     y = ys;
     ccdfY = ccdfYs;
