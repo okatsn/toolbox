@@ -63,28 +63,28 @@ else
     
     % test 2: NaN/empty and non-NaN/non-empty cell should
     % occurred in turn.
-    fprintf('Test 2: testing whether NaN/empty and non-NaN/non-empty arrays in segments_all occurred in turn. \n.');
-    thr = 0.2*randn(1,randi(2));
-    if length(thr)>1 && thr(1)*thr(2)>0 % if zero does not lie between thr 
-        % (i.e. thr(1) & (2) has the same sign)
-        thr(2) = -1*thr(2); % make thr(2) the opposite sign of the first one.
-    end
-    [segments_all] = split1dArrayByThreshold(Y,thr);
-    isnanorempty = @(x) all(isnan(x)) | isempty(x);
-    A_isallnanorempty = cellfun(isnanorempty,segments_all);
-    A_expected = ones(size(A_isallnanorempty));
-    if A_isallnanorempty(1) == 1 % first cell is empty/nan
-        A_expected(2:2:end) = 0;
-    else % A(1) == 0 % first cell is not empty/nan
-        A_expected(1:2:end) = 0;
-    end
-    if isequal(A_isallnanorempty,A_expected)
-        disp('Test 2 passed. NaN/empty and non-NaN/non-empty cells occurred in turn.');
-    else
-        warning('Test 2 not passed. NaN/empty and non-NaN/non-empty cells are not occurred in turn.');
-        nopass = nopass+1;
-    end
-    if false
+%     fprintf('Test 2: testing whether NaN/empty and non-NaN/non-empty arrays in segments_all occurred in turn. \n.');
+%     thr = 0.2*randn(1,randi(2));
+%     if length(thr)>1 && thr(1)*thr(2)>0 % if zero does not lie between thr 
+%         % (i.e. thr(1) & (2) has the same sign)
+%         thr(2) = -1*thr(2); % make thr(2) the opposite sign of the first one.
+%     end
+%     [segments_all] = split1dArrayByThreshold(Y,thr);
+%     isnanorempty = @(x) all(isnan(x)) | isempty(x);
+%     A_isallnanorempty = cellfun(isnanorempty,segments_all);
+%     A_expected = ones(size(A_isallnanorempty));
+%     if A_isallnanorempty(1) == 1 % first cell is empty/nan
+%         A_expected(2:2:end) = 0;
+%     else % A(1) == 0 % first cell is not empty/nan
+%         A_expected(1:2:end) = 0;
+%     end
+%     if isequal(A_isallnanorempty,A_expected)
+%         disp('Test 2 passed. NaN/empty and non-NaN/non-empty cells occurred in turn.');
+%     else
+%         warning('Test 2 not passed. NaN/empty and non-NaN/non-empty cells are not occurred in turn.');
+%         nopass = nopass+1;
+%     end
+
         fprintf('Test 3: split1dArrayByThreshold using different approaches and calculates statistices.');
         h_split = 0;
         thr2 = [h_split,h_split+1e-18];
@@ -92,14 +92,16 @@ else
         mtf1 = matfile(tempfilename); 
         mtf2 = matfile(tempfilename2);
         mtf2.Y = -mtf1.Y;
-        S1 = TsSegStat(mtf1,'Threshold',h_split);
-        S2 = TsSegStat(mtf2,'Threshold',-h_split);
-        S = TsSegStat(mtf1,'Threshold',thr2);
+        S1 = splitted1dArrayStatistics(mtf1,'Threshold',h_split);
+        S2 = splitted1dArrayStatistics(mtf2,'Threshold',-h_split);
+        S = splitted1dArrayStatistics(mtf1,'Threshold',thr2);
         duration1 = sort(S.duration);
-        vsquare1 = sort(S.vsquare);
+        sumabsY1 = sort(S.sumabsY);
         duration2 = sort([S1.duration;S2.duration]);
-        vsquare2 = sort([S1.vsquare;S2.vsquare]);
-        if isequal(duration1,duration2) && isequal(vsquare1,vsquare2)
+        sumabsY2 = sort([S1.sumabsY;S2.sumabsY]);
+%         maxY_1 = sort(S.maxY);
+%         maxY_2 = [S1.maxY;S2.maxY];
+        if isequal(duration1,duration2) && isequal(sumabsY1,sumabsY2) % && isequal(maxY_1,maxY_2)
             disp('Test 3 passed.');
         else
             warning('Test 3 not passed.');
@@ -119,7 +121,7 @@ else
             error('Please see the temporarily saved matfile, and manually delete these files.')
         end
 
-    end
+
     
     
 end
