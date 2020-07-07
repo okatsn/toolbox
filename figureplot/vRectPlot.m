@@ -21,6 +21,10 @@ ax = rslt.Axes;
 rectProps = rslt.rectangleProperties;
 parse(p,varargin{:});
 
+if isequal(rectProps,1)
+    rectProps = rectangle_name_value_pairs; % then use default
+end
+
 Y_range = ax.YLim;
 ystart = Y_range(1);
 yspan = Y_range(2) - Y_range(1);
