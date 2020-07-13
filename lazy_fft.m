@@ -12,6 +12,8 @@ function [f,P1,P2] = lazy_fft(X,t0,varargin)
 % Plot:
 %     plot(f,P2(1:n/2+1));% Plot the unique frequencies. see doc fft.
 %     plot(f,P1);
+% Bug to fix: 1:n/2+1 will cause 
+%             Warning: Integer operands are required for colon operator when used as index
 
 fft_input = {X};
 if length(t0)>1 % then t0 is the timeseries
@@ -49,6 +51,9 @@ P2 = abs(Y/L); % two-sided spectrum
 
 % Compute the single-sided spectrum P1 based on P2 and the even-valued signal length L.
 P1 = P2(1:n/2+1); % P1 = P2(1:L/2+1);
+% Warning will be raised since n/2 may not be an interger; however, it
+% seems ok. (Warning: Integer operands are required for colon operator when used as index. )
+
 P1(2:end-1) = 2*P1(2:end-1); % Single-Sided Amplitude Spectrum of X(t)
 
 % Define the frequency domain f

@@ -2,7 +2,8 @@ function [varargout] = specsGenerator(varargin)
 % generate specifications.
 % for example, mklist = specsGenerator('Marker',3);
 % where mklist = {'o','+','*','.','x'};
-numvarin = length(varargin);
+% E.g. [linestyles,markers] = specsGenerator('LineStyle',10,'Marker',3);
+numvarin = nargin;
 if rem(numvarin,2) ~= 0
     error("Input arguments must be name-value pairs. E.g. 'Marker',3, 'LineStyle',2,... ");
 end

@@ -1,6 +1,7 @@
 function [H,plt] = superLegend(legend_cell,plot_options,varargin)
-%
-
+% How to use:
+%     [H,plt] = superLegend({'point1','line2','line3'},{'*',{'Color','g'},'ro'},'IsMarker',[1,0,0])
+%     [H,plt] = superLegend({'point1','point2','point3'},{'*','^','o'},'IsMarker',1)
 
 % NameOnly_cell = {'legend'};
 
@@ -79,6 +80,10 @@ YTick_id = 1;
 for i = 1:NoD
     
     options_i = plot_options{i};
+    if ~iscell(options_i)
+        options_i = {options_i};
+    end
+    
     ismk_i = IsMarker1(i);
     y = [YTicks(YTick_id), YTicks(YTick_id)];
     x = [0.05, 0.05 + line_length];    
