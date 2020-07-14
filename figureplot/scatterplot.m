@@ -3,12 +3,32 @@ function plot_handles = scatterplot(X,Y,varargin)
 % scatterplot can do highly custom tasks (like X,Y being points of different
 % marker) that scatter cannot achieve; however, sctterplot is definitely
 % slower than scatter.
-% scatterplot(X,Y,'Color',{[1,0,0],'r','g','b',[0.5,0.1,0.2]},...
-%                 'Marker',{'*','^','p','h','o'},...
-%                 'LineWidth',2.5);
+% Examples:
+%     scatterplot(X,Y,'Color',{[1,0,0],'r','g','b',[0.5,0.1,0.2]},...
+%                  'Marker',{'*','^','p','h','o'},...
+%                  'LineWidth',2.5);
+%
+%     ax = axes(); % or ax = gca;
+%     scatterplot(ax,X,Y,...);
+
+if ishghandle(X)
+    ax = X;
+    X = Y;
+    Y = varargin{1};
+    varargin(1) = [];
+    if ischar(Y) || isStringScalar(Y)
+        error("Incorrect input syntax. 'scatterplot(ax,X,Y,...)' is expected.");
+    end
+else
+    ax = gca;
+end
+hold(ax,'on');
+if size(X)~=size(Y)
+    error("The size of X and Y are inconsistent.");
+end
+
 
 numplot = numel(X);
-
 p = inputParser;
 addParameter(p,'Marker',0);
 addParameter(p,'Color',0);
@@ -88,9 +108,8 @@ end
 plot_handles = gobjects(1,numplot);
 
 for i = 1:numplot
-    
-    plot_handles(i) = plot(X(i),Y(i),plot_options{i,:},'LineStyle','none');
+    plot_handles(i) = plot(ax,X(i),Y(i),plot_options{i,:},'LineStyle','none');
 end
-
+hold(ax,'off');
 end
 
