@@ -58,8 +58,8 @@ O.rmse=sqrt(MSE);
 O.slope=slope;
 O.intercept=intercept;
 O.PolyCoeff=p;
-O.functionDescription = sprintf('Y = %.2f*log(X) + %.2f',slope, intercept);
-O.function = @(x) slope*log(x) + intercept;
+O.functionDescription = sprintf('log(Y) = %.2f*log(X) + %.2f',slope, intercept);
+O.Y_pred = @(X) 10.^(slope*log(X) + intercept); % logY = slope*log(X) + intercept;
 
 %% Plot the data
 if do_plot
