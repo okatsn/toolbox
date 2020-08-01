@@ -6,7 +6,7 @@ function [Y,X] = simpleTrapezoidal(varargin)
 %     XR1: the position (x) of the right-top of the trapezoid.
 %     XR0: the position (x) of the right-bottom of the trapezoid.
 Xpoints = 100;
-if nargin >= 7
+if nargin >= 7 % at least 7 input argument
     if nargin == 8
         Xpoints = varargin{8};
     end

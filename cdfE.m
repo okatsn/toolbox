@@ -58,6 +58,9 @@ if len2ndarg == 0 % cdfE(Y) or cdfE(Y,'EdgeScale','log');
     edge_left = min(Y);
     edge_right = max(Y);
     edges = xxxspace(edge_left,edge_right,nbins+1);
+    if any(isnan(edges))
+        error("Unexpected NaN occurred in edges, probably because log on zero or negative value.");
+    end
     y = calcmidpoint(edges); % length(y) should equals to nbins
 elseif len2ndarg == 1 % cdfE(Y,nbins) or cdfE(Y,nbins,'EdgeScale','log');
     nbins = secondarg;

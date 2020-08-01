@@ -28,6 +28,9 @@
 %             be divided by the number of parfor iterations; otherwise, 
 %             memory might runs out. That is, you should manually set 'MemoryLimit' 
 %             when the function is executed inside the parfor loop.
+%             (!Hint) Manually assign this value will significantly
+%             speed up if EulerSDE_a is applied to generate a large
+%             amount of short timeseries.
 %
 % Becareful when change the variable name 'traceT';
 %
