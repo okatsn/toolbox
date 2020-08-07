@@ -1,4 +1,6 @@
-% e.g. 
+% This is similar to windowMean but do not support some features of windowMean.
+% windowMean and windowAverage should be merged one day.
+% How to use:
 % MatFile = matfile('G:\LongSDE\temp2.mat');
 % inputXY = MatFile; 
 % [Xs,Ys] = windowAverage(inputXY,'FieldName',{'fieldnameX','fieldnameY'})
