@@ -12,7 +12,7 @@ methods (Static)
     
     function [FitFunction] = Pst()
         % see Wu2020 (not submit yet)
-        FitFunction = @(v,P0,r,Fc,D) P0*exp(Fc*v/D).*exp(-r*v.*sign(v)/D);
+        FitFunction = @(P0,r,Fc,D,v) P0*exp(Fc*v/D).*exp(-r*v.*sign(v)/D);
     end
     
     
@@ -23,18 +23,18 @@ methods (Static)
 %     end
     
     function [f_neg,f_pos] = Pst_cases() % another equivalent form of Pst_CoulombFext_Wu2020
-        f_neg = @(v,P0,r,Fc,D) P0*exp((Fc + r)*v/D); % for v <= 0
-        f_pos = @(v,P0,r,Fc,D) P0*exp((Fc - r)*v/D); % for v > 0
+        f_neg = @(P0,r,Fc,D,v) P0*exp((Fc + r)*v/D); % for v <= 0
+        f_pos = @(P0,r,Fc,D,v) P0*exp((Fc - r)*v/D); % for v > 0
     end
     
     function [TEX_neg,TEX_pos] = trPst_cases()
-        fn = @(v,P0,r,Fc,D) P0*exp((Fc + r)*v/D); % f_neg, for v <= 0
-        fp = @(v,P0,r,Fc,D) P0*exp((Fc - r)*v/D); % f_pos, for v > 0
-        int_fn = @(v,P0,r,Fc,D) P0*D/(Fc+r)*exp((Fc + r)*v/D); % integral form
-        int_fp = @(v,P0,r,Fc,D) P0*D/(Fc-r)*exp((Fc - r)*v/D);
-        Pin = @(vmin,vmax,P0,r,Fc,D) (int_fn(0,P0,r,Fc,D) - int_fn(vmin,P0,r,Fc,D)) + (int_fp(vmax,P0,r,Fc,D)- int_fp(0,P0,r,Fc,D));
-        TEX_neg = @(v,vmin,vmax,P0,r,Fc,D) fn(v,P0,r,Fc,D)/Pin(vmin,vmax,P0,r,Fc,D);
-        TEX_pos = @(v,vmin,vmax,P0,r,Fc,D) fp(v,P0,r,Fc,D)/Pin(vmin,vmax,P0,r,Fc,D);
+        fn = @(P0,r,Fc,D,v) P0*exp((Fc + r)*v/D); % f_neg, for v <= 0
+        fp = @(P0,r,Fc,D,v) P0*exp((Fc - r)*v/D); % f_pos, for v > 0
+        int_fn = @(P0,r,Fc,D,v) P0*D/(Fc+r)*exp((Fc + r)*v/D); % integral form
+        int_fp = @(P0,r,Fc,D,v) P0*D/(Fc-r)*exp((Fc - r)*v/D);
+        Pin = @(vmin,vmax,P0,r,Fc,D) (int_fn(P0,r,Fc,D,0) - int_fn(P0,r,Fc,D,vmin)) + (int_fp(P0,r,Fc,D,vmax)- int_fp(P0,r,Fc,D,0));
+        TEX_neg = @(vmin,vmax,P0,r,Fc,D,v) fn(P0,r,Fc,D,v)/Pin(vmin,vmax,P0,r,Fc,D);
+        TEX_pos = @(vmin,vmax,P0,r,Fc,D,v) fp(P0,r,Fc,D,v)/Pin(vmin,vmax,P0,r,Fc,D);
 %         f_pos = @(v,P0,r,Fc,D) P0*exp((Fc - r)*v/D)/(((P0*D/(Fc+r)-P0*D/(Fc+r)*exp((Fc + r)*vmin/D))-()); % for v > 0
     end
 %     P0*D/(Fc-r)*exp((Fc - r)*v/D)-P0*D/(Fc-r)
