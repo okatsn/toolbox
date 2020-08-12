@@ -55,7 +55,7 @@ switch objclass
     case 'matlab.graphics.primitive.Text' % for x, ylabel
             originalParent = graphicObject.Parent;
             grandParent = graphicObject.Parent.Parent;
-            uncles = grandParent.Children;
+            uncles = grandParent.Children.findobj('Type','axes');            
             lenuncles = length(uncles);
             unclePositions = NaN(lenuncles,4);
             for i = 1:lenuncles

@@ -65,7 +65,7 @@ use_GRLaw = p.Results.GRLaw;
 modelfun = p.Results.ModelFunction;
 numclusters = p.Results.SegmentNumber;
 beta0 = p.Results.InitialGuess; % initial guess
-do_plot = ~isequal(p.Results.loglogPlot,0);
+do_plot = ~isequal(p.Results.Plot,0);
 Padding = p.Results.Padding;
 [hP,wP] = size(Padding);
 logbeforekmeans = true;
@@ -151,6 +151,10 @@ else
 end
 
 if numclusters > 1 && ~manually_split
+    if size(X,1) <= numclusters
+        disp("set debug point here!");
+    end
+    
     clusteridx = kmeans(X,numclusters); 
     splitpoint = find(diff(clusteridx)); 
     expected_n = numclusters-1;
