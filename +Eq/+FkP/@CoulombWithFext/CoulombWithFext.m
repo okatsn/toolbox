@@ -4,6 +4,10 @@ classdef CoulombWithFext
 % other artificial error.
 
 methods (Static)
+    function v_expectation = v_expectation()
+        % <v> = \int_{-\infty}^{+\infty} v p(v) dv ; see draft and guide.md
+        v_expectation = @(F_C,F_ext,D) -2*D*F_ext/(F_ext^2 - F_C^2);
+    end
     function P0 = P0()
         % coefficient for normalization
         P0 = @(r,Fc,D) (Fc^2- r^2)/(-2*r*D); 
