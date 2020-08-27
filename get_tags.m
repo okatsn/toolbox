@@ -18,6 +18,8 @@ function [O] = get_tags(inputchar, varargin)
 %         O.trn will be 
 %             {2020,2021}
 % 
+% The following functions depend on this:
+%     statind(); % calculate daily statistics in MagTIP
 
 
 default_expr = '(?<=%s\\[).+?(?=\\])';
@@ -103,7 +105,7 @@ for i = 1:numel(prefix)
     trn_tags = regexp(inputchar,match_expr_func(prefix_i),'match');   
     
     if do_unique
-        trn_tags = unique(trn_tags);
+        trn_tags = unique(trn_tags,'stable');
     end
     
     if do_reshape % this is usually for parfor

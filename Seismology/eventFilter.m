@@ -1,5 +1,5 @@
 function [catalog_F] = eventFilter(catalog,varargin)
-% catalog_F = EQinRange(catalog)
+% catalog_F = eventFilter(catalog)
 % input: 
 %     catalog 
 %         catalog should be a table with fields (VariableNames) 'Lon', 'Lat', 'Mag', 'Depth', 'Datetime'.

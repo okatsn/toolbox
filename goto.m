@@ -71,6 +71,12 @@ classdef goto
             cd(dir_x);
         end
         
+        function dir_x = MagTIP2020()
+            root0 = RootFolder;
+            dir_x = fullfile(root0,'1Programming','MATLAB','CWB_precursor',...
+                'MagTIP-2020','script');
+            cd(dir_x);
+        end
     end
     
 

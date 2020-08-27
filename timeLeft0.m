@@ -18,7 +18,16 @@
 %     delete(H2.waitbarHandle);
 % end
 % delete(H1.waitbarHandle);
-
+%
+%
+% OR 
+% tic; H = timeLeft0(total_iters,'titlename',10000); timeleftcounts = 1;
+% for ..
+%     for ...
+%         [H] = timeLeft1(toc,timeleftcounts,H); timeleftcounts = timeleftcounts +1;            
+%     end
+% end
+% delete(H.waitbarHandle);
 
 function H = timeLeft0(total_iters,functionNm,varargin)
 pos_H = [441, 292, 300, 63];

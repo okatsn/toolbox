@@ -15,6 +15,7 @@ function [dir_list, varargout] = datalist(keyword, targetfolder, varargin)
 %    '**FolderOnly': list only folders and all subfolders and their subfolders, and so on.
 %    'FolderOnly': list only 1st level folders.
 % SortBy: str or cell
+%    'SortBy',A: will sort rows using sortrows(list,A{:});
 %    'SortBy',{'datenum','descend'}: Sort the table using sortrows with descending 'datenum'
 %    'SortBy','datenum': Sort the table using sortrows with ascending (default) 'datenum'
 % Returns

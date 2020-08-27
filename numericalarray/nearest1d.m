@@ -3,6 +3,13 @@ function [nearest_idx_1,value_1,varargout] = nearest1d(array0,near_to)
 % 1st output: the index of the nearest element in array1.
 % 2nd output: the value (or 1darray) of the nearest element in array1.
 % e.g [idx,val] = nearest1d(randn(100,1),[0.1,2,0.9])
+if isempty(near_to)
+    nearest_idx_1 = [];%false(size(array0));
+    value_1 = [];
+    return
+end
+
+
 SzArr = size(array0);
 SzNr = size(near_to);
 [MinSzNr,MinSzNrIdx] = min(SzNr);

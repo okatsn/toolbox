@@ -4,17 +4,28 @@ function renameFiles(regexppattern,sprintfformat,oldpathlist,varargin)
 % Example, for file name '[Stat_thr=5]_Ts_D=5.34_r=1.00_Fc=1.00_Type=dry.mat', we have
 %     regexppattern = '((?<=(thr|D|r|Fc|Type)=)(\d+\.?\d*|\w+))';
 %     sprintfformat = '[Stat]_thr[%s]_D[%s]_r[%s]_Fc[%s]_Type[%s].mat';
-%     renameFiles(regexppattern,sprintfformat,oldpathlist);
+%     regexppattern for regexp using 'match':
+%         renameFiles(regexppattern,sprintfformat,oldpathlist); 
+%     regexppattern for regexp using 'names':
+%         renameFiles(regexppattern,sprintfformat,oldpathlist,'names'); 
     
 % future work: add support to regexp(...,'names');
+if nargin>3 && strcmp(varargin{1},'names')
+    regdo = 'names';
+    regout_is_struct = true;
+else
+    regdo = 'match';
+    regout_is_struct = false;
+end
+
 p = inputParser;
 addParameter(p,'Order',0);
 addParameter(p,'FunctionHandle',@(old,new) copyfile(old,new));
-addParameter(p,'NewPath',0);
+addParameter(p,'Delete',false);
 parse(p,varargin{:});
 Order = p.Results.Order;
 fileoperation = p.Results.FunctionHandle;
-newpathlist = p.Results.NewPath;
+to_delete = p.Results.Delete;
 rearrange = false;
 
 
@@ -32,11 +43,17 @@ end
 for i = 1:size(oldpathlist,1)
     oldpath = oldpathlist{i};
     [fdir,fname,fext] = fileparts(oldpath);
-    regout = regexp(fname,regexppattern,'match');
+    fname_ext = [fname,fext];
+    regout = regexp(fname_ext,regexppattern,regdo);
+    if regout_is_struct
+        regout = fieldvalues(regout);
+    end
+    
+    
     lenregout = length(regout);
     if lenvars ~= lenregout
         skippedcount = skippedcount + 1;
-        skippedfiles = [skippedfiles;{fname}];
+        skippedfiles = [skippedfiles;{fname_ext}];
         continue
     end
     
@@ -47,12 +64,15 @@ for i = 1:size(oldpathlist,1)
     newfname = sprintf(sprintfformat,regout{:});
     newpath = fullfile(fdir,newfname);
     fileoperation(oldpath,newpath);
+    if to_delete
+        delete(oldpath);
+    end
 end
 
 
 if skippedcount > 0
-    warning('Total %d files not copied/moved. See the following:\n',skippedcount);
-    warning('%s',skippedfiles{:});
+    headstr = sprintf('The following %d files not copied/moved:',skippedcount);
+    warning('%s\n',headstr,skippedfiles{:});
 end
 
 try
