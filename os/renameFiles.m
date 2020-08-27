@@ -51,6 +51,7 @@ end
 p = inputParser;
 addParameter(p,'Order',0);
 addParameter(p,'FunctionHandle',@(old,new) copyfile(old,new));
+addParameter(p,'Overwrite',false);
 addParameter(p,'Delete',false);
 % addParameter(p,'dirPattern','*'); % pattern for finding files. e.g. *.txt for all files end with '.txt'
 parse(p,varargin{:});
@@ -58,6 +59,7 @@ Order = p.Results.Order;
 fileoperation = p.Results.FunctionHandle;
 to_delete = p.Results.Delete;
 rearrange = false;
+overwriteexistingfile = p.Results.Overwrite;
 
 
 lenvars = length(regexp(sprintfformat,'%','match'));
@@ -131,7 +133,16 @@ for i = 1:total_iters
         
     newfname = sprintf(sprintfformat,regout{:});
     newpath = fullfile(fdir,newfname);
-    fileoperation(oldpath,newpath);
+    if ~overwriteexistingfile && isfile(newpath) 
+        continue
+    end
+    try
+        fileoperation(oldpath,newpath);
+    catch ME
+        [fdir_err,fname_err,fext_err] = fileparts(oldpath);
+        winopen(fdir_err);
+        error("The file '%s' may be broken. [%s]",[fname_err,fext_err],ME.message);
+    end
     if to_delete
         delete(oldpath);
     end
@@ -141,6 +152,8 @@ if total_iters>5000; delete(H.waitbarHandle); end
 if skippedcount > 0
     headstr = sprintf('The following %d files not copied/renamed:',skippedcount);
     warning('%s\n',headstr,skippedfiles{:});
+else
+    disp('All files sucessfully renamed.');
 end
 
 try
