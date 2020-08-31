@@ -101,14 +101,14 @@ dir_info = dir(fullfile(target_path, SearchIn, search_for)); % find all .txt in 
 % Characters next to a ** wildcard must be file separators
 dir_info(ismember({dir_info.name},{'.','..'}))=[];
 switch SearchOption
-    case 'FolderOnly'
+    case {'FolderOnly','OnlyFolder'}
         dir_info(~[dir_info.isdir])=[];  % remove non-directories (only folder name and path left)
         % dir_info(strcmp({dir_info.name},'..'))=[];
         % dir_info(ismember({dir_info.name},{'.','..'}))=[];
     case 'default_search'
         
         
-    case 'FileOnly'
+    case {'FileOnly','OnlyFile'}
         dir_info([dir_info.isdir]) = [];
 end
 
