@@ -6,6 +6,10 @@ function [catalog_F] = eventFilter(catalog,varargin)
 %         Use loadSheet.m to load catalog: catalog = loadSheet(filepath,'CWBcatalog');
 % Name-value parameter:
 %         ...,'Radius',0); % {[Lat,Lon],[r0,r1]} or  {[Lat,Lon],[r1]} % r0=0 by default
+%                          % 'Radius', {[LatLon1;LatLon2;...],r1} to find
+%                             non-repeated earthquakes in range r1 of
+%                             several points specified by the N by 2
+%                             element array.
 %         ...,'ConsiderDepth',0); % Filtering the catalog with 'Radius' 
 %                 without considering depth of the earthquake. (default is 1, which is much slower)
 %         ...,'Magnitude',0); % [LowerBound, UpperBound] of event magnitude.
@@ -91,15 +95,17 @@ switch class(Radius)
         StHypDist = NaN(NoD,1);
 %         fprintf('Center at: Latitude= %.2f; Longitude= %.2f \n',latlon1(1),latlon1(2));
         %                                                                                                                                     just for showing information
-        
+        numSt = size(latlon1,1);
         switch conDep
             case 0
                 for i = 1:NoD
-                    [eqdist , ~]=lldistkm(latlon1,LatLon2(i,:));
-                    % d1km: distance in km based on Haversine formula
-                    if eqdist<Rc1 && eqdist>Rc0
-                        ridx = [ridx i];
-                        StHypDist(i) = eqdist;
+                    for k = 1:numSt
+                        [eqdist , ~]=lldistkm(latlon1(k,:),LatLon2(i,:));
+                        % d1km: distance in km based on Haversine formula
+                        if eqdist<Rc1 && eqdist>Rc0
+                            ridx = [ridx i];
+                            StHypDist(i) = eqdist;
+                        end
                     end
                 end
             case 1
@@ -109,15 +115,21 @@ switch class(Radius)
                     % earth, you may refer to lla2ecef or sph2cart
                 end
                 for i = 1:NoD
-                    arclendeg=distance('gc',latlon1,LatLon2(i,:));
-                    arclenkm=deg2km(arclendeg);
-                    eqdist=sqrt(arclenkm.^2+Depth(i).^2);
-                    if eqdist<Rc1 && eqdist>Rc0
-                        ridx = [ridx i];
-                        StHypDist(i) = eqdist;
+                    for k = 1:numSt
+                        arclendeg=distance('gc',latlon1(k,:),LatLon2(i,:));
+                        arclenkm=deg2km(arclendeg);
+                        eqdist=sqrt(arclenkm.^2+Depth(i).^2);
+                        if eqdist<Rc1 && eqdist>Rc0
+                            ridx = [ridx i];
+                            StHypDist(i) = eqdist;
+                        end
                     end
                 end
         end
+        if numSt >1
+            ridx = unique(ridx);
+        end
+        
         catalog_F = catalog(ridx,:);
 %         if nargout >1
 %             varargout{1} = StHypDist;
