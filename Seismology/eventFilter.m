@@ -1,4 +1,4 @@
-function [catalog_F] = eventFilter(catalog,varargin)
+function [catalog_F,target_ind] = eventFilter(catalog,varargin)
 % catalog_F = eventFilter(catalog)
 % input: 
 %     catalog 
@@ -39,10 +39,12 @@ Radius = rslt.Radius;
 MagRange = rslt.Magnitude;
 TimeRange = rslt.TimeRange;
 
+height_tb = height(catalog);
 
 %% select by time
 if isequal(TimeRange,0)
 % do nothing
+    tidx = true(height_tb,1);
 else
     try
         switch class(TimeRange)
@@ -67,44 +69,46 @@ else
         rethrow(ME)
     end
     tidx = catalog.DateTime>= dt0 & catalog.DateTime<=dt1;
-    catalog = catalog(tidx,:);
-%     fprintf('User defined TimeRange: %s<t<%s  \n',datestr(dt0,'yyyymmdd'),datestr(dt1,'yyyymmdd'));
+%     catalog = catalog(tidx,:);
+
 end
 %% Select by Magnitude
 if isequal(MagRange,0)
-    MagRange = [MagRange, 13]; %                                                                                just for showing information
+    midx = true(height_tb,1);
 else
     MagRange = [MagRange, 13];% no events will larger than 13;
     midx = catalog.Mag> MagRange(1) & catalog.Mag<MagRange(2);
-    catalog = catalog(midx,:);
+%     catalog = catalog(midx,:);
 end
-
+tmidx = tidx & midx;
 %% Select by Radius
-Depth = catalog.Depth;
-LatLon2 = [catalog.Lat,catalog.Lon]; 
-% faster to copy a certain variable from table before entering for loop.
 
-switch class(Radius)
-    case 'cell'
-        ridx = [];
+if ~isequal(Radius,0)
+    ridx = false(height_tb,1);
+    Depth = catalog.Depth;
+    LatLon2 = [catalog.Lat,catalog.Lon]; 
+    % faster to copy a certain variable from table before entering for loop.
+    if iscell(Radius)
         RcRange = [0, Radius{2}]; % Radius{2} may be e.g. 15 or [5,15]
         Rc0 = RcRange(end-1);
         Rc1 = RcRange(end);
         latlon1 = Radius{1};      
-        NoD = numel(catalog.DateTime);
-        StHypDist = NaN(NoD,1);
-%         fprintf('Center at: Latitude= %.2f; Longitude= %.2f \n',latlon1(1),latlon1(2));
-        %                                                                                                                                     just for showing information
+        NoD = height_tb; %numel(catalog.DateTime);
+        StHypDist = NaN(NoD,1);  %just for showing information
         numSt = size(latlon1,1);
         switch conDep
             case 0
                 for i = 1:NoD
-                    for k = 1:numSt
-                        [eqdist , ~]=lldistkm(latlon1(k,:),LatLon2(i,:));
-                        % d1km: distance in km based on Haversine formula
-                        if eqdist<Rc1 && eqdist>Rc0
-                            ridx = [ridx i];
-                            StHypDist(i) = eqdist;
+                    if tmidx(i) % calculate only if in the range of magnitude and date time.
+                        % otherwise, skip, because check if eqk in Rc is
+                        % the most time consuming process.
+                        for k = 1:numSt
+                            [eqdist , ~]=lldistkm(latlon1(k,:),LatLon2(i,:));
+                            % d1km: distance in km based on Haversine formula
+                            if eqdist<Rc1 && eqdist>Rc0
+                                ridx(i) = true;
+                                StHypDist(i) = eqdist;
+                            end
                         end
                     end
                 end
@@ -115,39 +119,30 @@ switch class(Radius)
                     % earth, you may refer to lla2ecef or sph2cart
                 end
                 for i = 1:NoD
-                    for k = 1:numSt
-                        arclendeg=distance('gc',latlon1(k,:),LatLon2(i,:));
-                        arclenkm=deg2km(arclendeg);
-                        eqdist=sqrt(arclenkm.^2+Depth(i).^2);
-                        if eqdist<Rc1 && eqdist>Rc0
-                            ridx = [ridx i];
-                            StHypDist(i) = eqdist;
+                    if tmidx(i) % calculate only if in the range of magnitude and date time.
+                        % otherwise, skip, because check if eqk in Rc is
+                        % the most time consuming process.
+                        for k = 1:numSt
+                            arclendeg=distance('gc',latlon1(k,:),LatLon2(i,:));
+                            arclenkm=deg2km(arclendeg);
+                            eqdist=sqrt(arclenkm.^2+Depth(i).^2);
+                            if eqdist<Rc1 && eqdist>Rc0
+                                ridx(i) = true;
+                                StHypDist(i) = eqdist;
+                            end
                         end
                     end
                 end
         end
-        if numSt >1
-            ridx = unique(ridx);
-        end
-        
-        catalog_F = catalog(ridx,:);
-%         if nargout >1
-%             varargout{1} = StHypDist;
-%         end
-    case 'double'
-        if isequal(Radius,0) % if no input (= default)
-%             Rc0 = 0;       Rc1 = 'infinite'; %                                                                            just for showing information
-            catalog_F = catalog;
-%             disp('Center and Radius not assigned.')
-        else
-            errorStruct.message = "Incorrect input parameter 'Radius'. It should be {[Lat,Lon],[r0,r1]}.";
-            error(errorStruct)
-        end
-    otherwise
-        errorStruct.message = "Incorrect class of input parameter 'Radius'.";
+    else
+        errorStruct.message = "Incorrect input parameter 'Radius'. It should be {[Lat,Lon],[r0,r1]}.";
         error(errorStruct)
+    end
+else
+    ridx = true(height_tb,1);
 end
-
+target_ind = tmidx & ridx;
+catalog_F = catalog(target_ind,:);
 %% Plot (copied)
 
 %% Summary
