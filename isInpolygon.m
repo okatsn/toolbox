@@ -1,4 +1,4 @@
-function [inBg, insideRatio] = isInpolygon(xBg,yBg,xv,yv,varargin)
+function [inBg, varargout] = isInpolygon(xBg,yBg,xv,yv,varargin)
 % Determine if points are in polygon(s).
 % To calculate the area of only one polygon, use 'polyarea' instead,
 % 'isInpolygon' uses 'inpolygon' and is 500 times slower than 'polyarea'.
@@ -42,7 +42,10 @@ if numPoly>1
 end
 
 inBg = inpolygon(xBg,yBg,xv(:),yv(:));
-insideRatio = sum(inBg,'all')/length(xBg(:));
+if nargout>1
+    insideRatio = sum(inBg,'all')/length(xBg(:));
+    varargout{1} = insideRatio;
+end
 
 
 end
