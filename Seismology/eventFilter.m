@@ -123,9 +123,10 @@ if ~isequal(Radius,0)
                         % otherwise, skip, because check if eqk in Rc is
                         % the most time consuming process.
                         for k = 1:numSt
-                            arclendeg=distance('gc',latlon1(k,:),LatLon2(i,:));
-                            arclenkm=deg2km(arclendeg);
-                            eqdist=sqrt(arclenkm.^2+Depth(i).^2);
+                            [eqdist] = simpleStationEQKdist3D(latlon1(k,:),LatLon2(i,:),Depth(i));
+%                             arclendeg=distance('gc',LatLonSt,LatLonEQK);
+%                             arclenkm=deg2km(arclendeg);
+%                             eqdist=sqrt(arclenkm.^2+DepthEQK.^2);
                             if eqdist<Rc1 && eqdist>Rc0
                                 ridx(i) = true;
                                 StHypDist(i) = eqdist;
