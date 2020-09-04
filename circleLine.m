@@ -23,6 +23,7 @@ else
     numPt = 100; % default
     theta = linspace(0,2*pi,numPt);
 end
+
 Cx = r*cos(theta)+x;
 Cy = r*sin(theta)+y;
 Cx = Cx(:);
