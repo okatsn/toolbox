@@ -15,6 +15,9 @@ XmissingInd = YisNaN; % ~ismember(X0,X);
 Xintp = X0(XmissingInd); 
 
 std1 = nanmedian(movstd(Y0,250)); % to estimate the std for the nosie.
+if isnan(std1)
+    std1 = nanmedian(Y0); % to estimate the std for the nosie
+end
 try
     Yintp = interp1(X,Y,Xintp,'linear');
 catch ME
@@ -24,8 +27,8 @@ catch ME
         Y0(stillnan) = nanmean(Y0) + std1*randn(sum(stillnan),1);
         return
     else
-        keyboard;
-        rethrow(ME);
+        warning("[fillNaN] Error in bandpass filtering.");
+        % rethrow(ME);
     end
 end
 % figure; plot(X0,Y0,'o'); hold on; plot(Xintp,Yintp,'^')
