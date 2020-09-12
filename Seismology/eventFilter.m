@@ -13,7 +13,9 @@ function [catalog_F,target_ind] = eventFilter(catalog,varargin)
 %         ...,'ConsiderDepth',0); % Filtering the catalog with 'Radius' 
 %                 without considering depth of the earthquake. (default is 1, which is much slower)
 %         ...,'Magnitude',0); % [LowerBound, UpperBound] of event magnitude.
-%         ...,'TimeRange',0); % [LowerBound, UpperBound] of event magnitude.
+%         ...,'TimeRange',0); % [LowerBound, UpperBound] of event datetime.
+%         It has to be 1 by 2 array of datenumber or datetime, or
+%         characters containing two separated eight digits such as '20111212-20131013'
 % output:
 %     catalog_F = only events in the specified 'TimeRange', 'Magnitude', 'Radius' around point P... and etc. radius Rc .
 
@@ -49,15 +51,18 @@ else
     try
         switch class(TimeRange)
             case 'double'
-                dt0 = datetime(TimeRange(1),'ConvertFrom','datenum');
-                dt1 = datetime(TimeRange(2),'ConvertFrom','datenum');
+                dt0 = datetime(TimeRange(:,1),'ConvertFrom','datenum');
+                dt1 = datetime(TimeRange(:,2),'ConvertFrom','datenum');
             case {'char','string'}
                 A = regexp(TimeRange,'\d{8}','match');
+                if length(A)>2
+                    error("'TimeRange' for character inputs does not support multiple pairs of date strings.");
+                end
                 dt0 = datetime(A{1},'InputFormat','yyyyMMdd');
                 dt1 = datetime(A{2},'InputFormat','yyyyMMdd');
             case 'datetime'
-                dt0 = TimeRange(1);
-                dt1 = TimeRange(2);
+                dt0 = TimeRange(:,1);
+                dt1 = TimeRange(:,2);
             otherwise
                 errorStruct.message = 'TimeRange has to be a string, or 1 by 2  datetime/datenum array.';
                 error(errorStruct)
