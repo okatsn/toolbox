@@ -39,7 +39,7 @@ funNm = '[splitted1dArrayStatistics]';
 
 p = inputParser;
 addParameter(p,'MemoryLimit',0);
-addParameter(p,'Threshold',0.01);
+addParameter(p,'Threshold',0);
 addParameter(p,'Validation',{});
 addParameter(p,'matfileSave',0);
 % addParameter(p,'DataFit',0);
@@ -118,11 +118,11 @@ id1 = 1;
 
 stats = [];
 
-
+matfilesaved = 0;
 
 tic; H = timeLeft0(maxiters,funNm);
 for i = 1:maxiters 
-
+    islastloop = i==maxiters;
     stats_tmp_f = [];
     % for the long segment that cross more-than-one iterations.
     % If the long segment is not complete yet, 
@@ -178,6 +178,7 @@ for i = 1:maxiters
         outside_id(1) = []; 
         % remove the 1st segment since it has been taken into accounted
         % in stats_tmp2.
+
         if no_inside 
             % prev_seg_tail_not_finished && this_first_seg_is_outside 
             % && no_inside:
@@ -188,6 +189,7 @@ for i = 1:maxiters
                 tlt2 = 'Long process that keeps going in this loop';
                 error([tlt2,'. Error: numel seg is not right.']);
             end
+            
             continue  
             % ONLY 1 segment: very probably this segment is not completed yet.
             % stats_tmp_part are passed into next iteration
@@ -236,30 +238,13 @@ for i = 1:maxiters
     
     if issaveasmatfile
         len_S_tmp = size(stats,1);
-        if len_S_tmp > memoryLimit || i == maxiters % then save to matfile
-            len_S = size(S,columnNames{1},1);
-            S_id0 = len_S + 1;
-            S_id1 = len_S + len_S_tmp;
-            indS = S_id0:S_id1;
-            if ~isempty(indS)
-                % matfile does not support index to be empty
-                % indS is empty only if length(duration) is zero
-                for nmi = 1:lennames
-                    colname_i = columnNames{nmi};
-                    S.(colname_i)(indS,1) = stats(:,nmi);
-                end           
-                stats = []; % and release the memory.
-            else
-                % if length(duration) is zero, then there's no need to
-                % write anything to matfile. 
-            end
-
+        if len_S_tmp > memoryLimit || islastloop % then save to matfile
+            [stats,matfilesaved] = savethematfile(S,stats,columnNames,matfilesaved);
         end
     end
     [H] = timeLeft1(toc,i,H);
 end
 delete(H.waitbarHandle);
-
 if ~issaveasmatfile
     for nmi = 1:lennames
         colname_i = columnNames{nmi};
@@ -268,6 +253,12 @@ if ~issaveasmatfile
 else
     % do nothing, since the variables already saved.
 end
+
+if issaveasmatfile && isequal(matfilesaved,0)
+    [stats,matfilesaved] = savethematfile(S,stats,columnNames,matfilesaved);
+end
+
+
 
 S.threshold = thr;
 
@@ -322,3 +313,24 @@ for k = 1:NoSeg
 end
 end
 
+function [stats,matfilesaved] = savethematfile(S,stats,columnNames,matfilesaved)
+len_S_tmp = size(stats,1);
+lennames = length(columnNames);
+len_S = size(S,columnNames{1},1);
+S_id0 = len_S + 1;
+S_id1 = len_S + len_S_tmp;
+indS = S_id0:S_id1;
+if ~isempty(indS)
+    % matfile does not support index to be empty
+    % indS is empty only if length(duration) is zero
+    for nmi = 1:lennames
+        colname_i = columnNames{nmi};
+        S.(colname_i)(indS,1) = stats(:,nmi);
+    end           
+    stats = []; % and release the memory.
+    matfilesaved = matfilesaved + 1;
+else
+    % if length(duration) is zero, then there's no need to
+    % write anything to matfile. 
+end     
+end
