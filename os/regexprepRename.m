@@ -14,6 +14,14 @@ if ischar(pathlist)
     pathlist = {pathlist};
 end
 
+if ischar(match_patterns)
+    match_patterns = {match_patterns};
+end
+
+if ischar(replaced_by)
+    replaced_by = {replaced_by};
+end
+
 for i = 1:length(pathlist)
     oldpath = pathlist{i};
     [fdir,fname,fext] = fileparts(oldpath);
