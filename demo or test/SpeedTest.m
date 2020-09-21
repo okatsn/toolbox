@@ -1,5 +1,20 @@
 
-%% Efficiency test
+%% Template
+iters = 100;
+randXY = rand(numGrains,2);
+xBg = randXY(:,1);
+yBg = randXY(:,2);
+tic;
+for i = 1:iters
+Area = polyarea(xv,yv);
+end
+fprintf('1: %.6f sec \n',toc);
+
+tic;
+for i = 1:iters
+inp = inpolygon(xBg,yBg,xv,yv);
+end
+fprintf('2: %.6f sec \n',toc);
 
 %% Template
 iters = 10000;
@@ -14,6 +29,20 @@ for i = 1:iters
 
 end
 fprintf('2: %.6f sec \n',toc);
+%% Efficiency test
+iters = 10000;
+tic;
+for i = 1:iters
+    sum(XmissingInd);
+end
+fprintf('1: %.6f sec \n',toc);
+
+tic;
+for i = 1:iters
+    sum(XmissingInd,'all');
+end
+fprintf('2: %.6f sec \n',toc);
+
 %%
 iters = 1000000;
 tic;
