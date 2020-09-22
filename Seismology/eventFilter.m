@@ -5,17 +5,50 @@ function [catalog_F,target_ind] = eventFilter(catalog,varargin)
 %         catalog should be a table with fields (VariableNames) 'Lon', 'Lat', 'Mag', 'Depth', 'Datetime'.
 %         Use loadSheet.m to load catalog: catalog = loadSheet(filepath,'CWBcatalog');
 % Name-value parameter:
-%         ...,'Radius',0); % {[Lat,Lon],[r0,r1]} or  {[Lat,Lon],[r1]} % r0=0 by default
-%                          % 'Radius', {[LatLon1;LatLon2;...],r1} to find
-%                             non-repeated earthquakes in range r1 of
-%                             several points specified by the N by 2
-%                             element array.
-%         ...,'ConsiderDepth',0); % Filtering the catalog with 'Radius' 
-%                 without considering depth of the earthquake. (default is 1, which is much slower)
+%         ...,'Radius',0); 
+%             Disabled. I.e., no selection according to the event positions.
+%
+%         ...,'Radius',{[Lat,Lon],[r0,r1]});
+%             Select the events whose distances d between [Lat,Lon] and 
+%             events' hypocenters/epicenters satisfying r0 < d < r1.
+%
+%         ...,'Radius',{[Lat,Lon],[r1]}; 
+%             Same as above but with r0=0 by default
+%         
+%         LatLons = [LatLon1;LatLon2;...];% LatLon1 = [21, 122] for example
+%         ...,'Radius', {LatLons,r1});
+%             Select all earthquakes inside multiple ranges of radius r1 
+%             centered at several points (LatLons) non-repeatedly. 
+%             LatLons is an N by 2 array, and LatLon1 is 1 by 2.
+%         
+%         Rcs = [r1;r2;...];
+%         ...,'Radius', {LatLons,Rcs});
+%             Select all earthquakes inside multiple ranges, r1 centered at
+%             LatLon1, r2 at LatLon2,..., non-repeatedly. 
+%             Rcs can be either N by 1 or N by 2 array.
+%             That is, it can be [r1_1;r1_2,...] 
+%             or [r0_1,r1_1;r0_2,r1_2;...] that has identical number of
+%             rows as LatLons.
+%
+%         ...,'Radius', {LatLon1,Rcs});
+%             Select all earthquakes inside multiple ranges, Rcs centered 
+%             at the same point LatLon1 (1 by 2 array), non-repeatedly. 
+%
+%         ...,'ConsiderDepth',0); 
+%             Filtering the catalog with 'Radius' 
+%             without considering depth of the earthquake.
+%             That is, use the epicenters to calculate the distance.
+%
+%         ...,'ConsiderDepth',1);
+%             Use the hypocenters to calculate the distance.
+%             (default is 1, which is much slower than 0)
+%
 %         ...,'Magnitude',0); % [LowerBound, UpperBound] of event magnitude.
+%
 %         ...,'TimeRange',0); % [LowerBound, UpperBound] of event datetime.
-%         It has to be 1 by 2 array of datenumber or datetime, or
-%         characters containing two separated eight digits such as '20111212-20131013'
+%             It has to be 1 by 2 array of datenumber or datetime, or
+%             characters containing two separated eight digits such as 
+%             '20111212-20131013'.
 % output:
 %     catalog_F = only events in the specified 'TimeRange', 'Magnitude', 'Radius' around point P... and etc. radius Rc .
 
@@ -89,36 +122,77 @@ tmidx = tidx & midx;
 %% Select by Radius
 
 if ~isequal(Radius,0)
-    ridx = false(height_tb,1);
+    ridx = false(height_tb,1); % false means to discard
     Depth = catalog.Depth;
     LatLon2 = [catalog.Lat,catalog.Lon]; 
     % faster to copy a certain variable from table before entering for loop.
+    if istable(Radius)
+        tb = Radius;
+        try
+            try
+                Radius = {[tb.LatLon],tb.Rc};
+            catch
+                Radius = {[tb.Lat,tb.Lon],tb.Rc};
+            end
+        catch ME
+            msg0 = strcat("For input a table as 'Radius', ",...
+             "the table must contains fields 'Lat' for latitude, ",...
+             "'Lon' for longitude ",...
+             "(or 'LatLon' for latitude and longitude),",...
+             " and 'Rc' for radius/distance.",...
+             " (Original error: %s)");
+            msg1 = sprintf(msg0,ME.message);
+            errorStructTb.message = msg1;
+            errorStructTb.identifier = ME.identifier;
+            errorStructTb.stack = ME.stack;
+            error(errorStructTb);
+        end
+    end
+    
     if iscell(Radius)
-        RcRange = [0, Radius{2}]; % Radius{2} may be e.g. 15 or [5,15]
-        Rc0 = RcRange(end-1);
-        Rc1 = RcRange(end);
         latlon1 = Radius{1};      
+        Radius2 = Radius{2};
+        numSt1 = size(latlon1,1);
+        numSt2 = size(Radius2,1);
+        if numSt1>1 && numSt2==1
+            % if size(Radius{1},1) ~= size(Radius{2},1),
+            % then repeat the array to make their number of rows identical
+            Radius2 = repmat(Radius2,numSt1,1);
+        elseif numSt2>1 && numSt1==1
+            latlon1 = repmat(latlon1,numSt2,1);
+        end
+        
+        RcRange = [zeros(numSt1,1), Radius2]; % Radius{2} may be e.g. 15 or [5,15]
+        Rc0 = RcRange(:,end-1);
+        Rc1 = RcRange(:,end);
+
         NoD = height_tb; %numel(catalog.DateTime);
         StHypDist = NaN(NoD,1);  %just for showing information
-        numSt = size(latlon1,1);
+        
         switch conDep
             case 0
                 for i = 1:NoD
                     if tmidx(i) % calculate only if in the range of magnitude and date time.
                         % otherwise, skip, because check if eqk in Rc is
                         % the most time consuming process.
-                        for k = 1:numSt
+                        for k = 1:numSt1
+                            if ridx(i)
+                                continue % since once ridx(i) is set to be
+                                % true, it's enough and needless to
+                                % consider other ranges.
+                            end
+                            
                             [eqdist , ~]=lldistkm(latlon1(k,:),LatLon2(i,:));
                             % d1km: distance in km based on Haversine formula
-                            if eqdist<Rc1 && eqdist>Rc0
-                                ridx(i) = true;
+                            if eqdist<Rc1(k) && eqdist>Rc0(k)
+                                ridx(i) = true; % true for selected
                                 StHypDist(i) = eqdist;
                             end
                         end
                     end
                 end
             case 1
-                if Rc1>1000
+                if any(Rc1>1000)
                     warning('Beware that distance is NOT calculated in 3D space, i.e. If Rc or Depth is very large, results deviate.');
                     % to get the real distance between the two points on
                     % earth, you may refer to lla2ecef or sph2cart
@@ -127,13 +201,19 @@ if ~isequal(Radius,0)
                     if tmidx(i) % calculate only if in the range of magnitude and date time.
                         % otherwise, skip, because check if eqk in Rc is
                         % the most time consuming process.
-                        for k = 1:numSt
+                        for k = 1:numSt1
+                            if ridx(i)
+                                continue % since once ridx(i) is set to be
+                                % true (selected), it's enough and needless 
+                                % to consider other ranges.
+                            end
+                            
                             [eqdist] = simpleStationEQKdist3D(latlon1(k,:),LatLon2(i,:),Depth(i));
 %                             arclendeg=distance('gc',LatLonSt,LatLonEQK);
 %                             arclenkm=deg2km(arclendeg);
 %                             eqdist=sqrt(arclenkm.^2+DepthEQK.^2);
-                            if eqdist<Rc1 && eqdist>Rc0
-                                ridx(i) = true;
+                            if eqdist<Rc1(k) && eqdist>Rc0(k)
+                                ridx(i) = true; % true for selected
                                 StHypDist(i) = eqdist;
                             end
                         end
@@ -145,7 +225,7 @@ if ~isequal(Radius,0)
         error(errorStruct)
     end
 else
-    ridx = true(height_tb,1);
+    ridx = true(height_tb,1); % All true means all selected
 end
 target_ind = tmidx & ridx;
 catalog_F = catalog(target_ind,:);
