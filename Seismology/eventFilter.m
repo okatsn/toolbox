@@ -115,7 +115,7 @@ if isequal(MagRange,0)
     midx = true(height_tb,1);
 else
     MagRange = [MagRange, 13];% no events will larger than 13;
-    midx = catalog.Mag> MagRange(1) & catalog.Mag<MagRange(2);
+    midx = catalog.Mag>= MagRange(1) & catalog.Mag<MagRange(2);
 %     catalog = catalog(midx,:);
 end
 tmidx = tidx & midx;
