@@ -32,6 +32,12 @@ function [inBg, varargout] = isInpolygon(xBg,yBg,xv,yv,varargin)
 %     hold on;
 %     plot(xBg,yBg,'o'); 
 %     plot(xBg(inBg),yBg(inBg),'*');
+%
+%     [Cx,Cy] = arrayfun(@(x,y,r) circleLine(x,y,r),Lon,Lat,Rcx,'UniformOutput',false);
+% 
+%     xv = [Cx{:}];
+%     yv = [Cy{:}];
+%     [inBg,insideRatio] = isInpolygon(xBg,yBg,xv,yv);
 
 numPoly = size(xv,2);
 if numPoly>1
