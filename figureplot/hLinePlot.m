@@ -1,5 +1,7 @@
-% add multiple vertical line to plot
-% example : vLinePlot([1,2,3],gca_2,'line_config',{'Color','r'});
+% add multiple horizontal lines to plot
+% example : 
+%     ax = gca;
+%     hLinePlot([1,2,3],'Axes',ax,'LineProperties',{'Color','r'});
 function [Ax1,varargout] = hLinePlot(add_line_at_Y,varargin)
 p = inputParser;
 default_config_of_line = {}; %{'Color','g'};

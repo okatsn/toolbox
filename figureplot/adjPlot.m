@@ -13,7 +13,7 @@ warningmsg = 'Empty graphic objects.';
 setbox = -1;
 FontSz = 12;
 % FontName = 'Noto Sans CJK TC Regular'; % use listfonts in command window to see the options
-FontName = 'Helvetica';
+% FontName = 'Helvetica';
 FontWeight = 'normal';% either normal or bold
 LineWidth = 1.6;
 
@@ -83,12 +83,12 @@ end
 
 if r.larger %Font
     if ~isempty(targetAxes)
-        set(targetAxes,'FontName',FontName,'FontSize',FontSz ,'FontWeight',FontWeight);
+        set(targetAxes,'FontSize',FontSz ,'FontWeight',FontWeight); % ,'FontName',FontName
     else
         warning(warningmsg);
     end
     if ~isempty(subplotTitle)
-        set(subplotTitle,'FontName',FontName,'FontSize',FontSz+dem)
+        set(subplotTitle,'FontSize',FontSz+dem)
     end
 end
 

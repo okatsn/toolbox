@@ -1,4 +1,4 @@
-function parSave(filename,x,varargin)
+function parSave(filename,S_parsaved,varargin)
 % the save function that is workable in parfor.
-    save(filename,'x',varargin{:});
+    save(filename,'S_parsaved',varargin{:});
 end

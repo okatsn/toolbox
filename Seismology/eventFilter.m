@@ -10,7 +10,8 @@ function [catalog_F,target_ind] = eventFilter(catalog,varargin)
 %
 %         ...,'Radius',{[Lat,Lon],[r0,r1]});
 %             Select the events whose distances d between [Lat,Lon] and 
-%             events' hypocenters/epicenters satisfying r0 < d < r1.
+%             events' hypocenters/epicenters satisfying r0 < d < r1. r0, r1
+%             should be in the unit kilometer.
 %
 %         ...,'Radius',{[Lat,Lon],[r1]}; 
 %             Same as above but with r0=0 by default

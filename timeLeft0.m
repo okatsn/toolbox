@@ -70,6 +70,6 @@ H.tocs = NaN(1,H.numel_toc);
 H.do_update = do_update;
 H.inv_total_iters = total_iters^(-1);
 H.total_iters = total_iters;
-H.waitbar_message = ['[',functionNm,'] (%d/%d)\n','TimeElapse=%s, TimeLeft=%s.'];
+H.waitbar_message = ['[',functionNm,'] (%d/%d)\n','TimeElapsed=%s, TimeLeft=%s.'];
 
 end
