@@ -1,4 +1,3 @@
-
 function [ax_simple] = lazy_annotation(gcf_,text_,varargin)
 % lazy_annotation(gcf,'(a),(b);(c),(d)','do','part_labels','FontSize',16);
 %  The dimentions have to be consistent.
@@ -29,7 +28,7 @@ shapeType = rslt.shapeType;
 task = rslt.do;
 FontSize_1 = rslt.FontSize;  shift = rslt.Shift;
 boxWidth = 0.1;
-boxHeight = 0.08;
+boxHeight = 0.05;
 
 Length_dim = length(dim);
 switch Length_dim
@@ -58,11 +57,11 @@ switch task
         fprintf('shift of part-label (from top-left corner): [%.2f %.2f]\n',shift(1),shift(2));
 % gcf_= gcf; shapeType = 'textbox';string_ = 'a,b,c;d,e,f'; % for TEST
         rows = strsplit(text_,';'); % split string by ';'
-        % rows will be e.g. 1กั2 cell array: {{'a,b,c'},{'d,e,f'}}
+        % rows will be e.g. 1ยกร‘2 cell array: {{'a,b,c'},{'d,e,f'}}
         tmp = regexp(rows(:),'[^,|;]*','match');
-        % tmp will be e.g. 2กั1 cell array:    {{1กั3 cell};{1กั3 cell}}
+        % tmp will be e.g. 2ยกร‘1 cell array:    {{1ยกร‘3 cell};{1ยกร‘3 cell}}
         part_labels = vertcat(tmp{:});
-        % part_labels will be e.g.   2กั3 cell array { {'a'},{'b'},{'c'}; {'d'},{'e'},{'f'} }
+        % part_labels will be e.g.   2ยกร‘3 cell array { {'a'},{'b'},{'c'}; {'d'},{'e'},{'f'} }
         [nrows,ncols] = size(part_labels);
 
         ax = gcf_.Children.findobj('-regexp', 'Type', 'axes');
@@ -71,8 +70,8 @@ switch task
         for i = 1:iters
 %             x0y0(i,1) = ax(i).Position(1);
 %             x0y0(i,2) = ax(i).Position(2)+ax(i).Position(4);
-            x0y0(i,1) = ax(i).OuterPosition(1);
-            x0y0(i,2) = ax(i).OuterPosition(2)+ax(i).OuterPosition(4);
+            x0y0(i,1) = max([ax(i).OuterPosition(1),0]);
+            x0y0(i,2) = max([ax(i).OuterPosition(2)+ax(i).OuterPosition(4),0]);
         end
         up_left = sortrows(x0y0,2,'descend'); % sort by y_starts.
         C = mat2cell(up_left,[ncols*ones(1,nrows)],[2]); % [xstart ystart] has dimension [2].
@@ -104,8 +103,13 @@ switch task
         C2 = mat2cell(xy_start,xparts,yparts); % [xstart ystart] has dimension [2].
 %         assignin('base','C2',C2); % For debug
         
-        for i = 1:numel(C2)
-            dim = [C2{i}+shift, boxWidth, boxHeight];
+        NC2 = numel(C2);
+        if size(shift,1) == 1
+            shift = repmat(shift,NC2,1);
+        end
+
+        for i = 1:NC2
+            dim = [C2{i}+shift(i,:), boxWidth, boxHeight];
             dim(2) = min(1-boxHeight,dim(2)); % to avoid
             
             ax_simple(i) = annotation(gcf_,shapeType,dim,'String',part_labels{i},'LineStyle','none',...
@@ -119,4 +123,3 @@ switch task
                   
 end
 end
-
