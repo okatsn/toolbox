@@ -38,7 +38,7 @@ for i = 1:nstr
         str2disp = Strs{i}; % no indent
     end
     disp(str2disp);
-    if ismember(i,do_blackLine_at)
+    if do_blankLine && ismember(i,do_blackLine_at)
         disp('    ');
     end
 end

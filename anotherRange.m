@@ -1,6 +1,6 @@
 function [array1] = anotherRange(startstop,length,varargin)
-% [array1] = anotherrange([0,1],100)
-% [array1] = anotherrange([0,1],100,@logspace)
+% [array1] = anotherRange([0,1],100)
+% [array1] = anotherRange([0,1],100,@logspace)
 functionHandle = @linspace;
 if nargin > 2
     firstarg = varargin{1};

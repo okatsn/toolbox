@@ -9,12 +9,17 @@ function [filepathnotrepeat] = pathnonrepeat(filepath,varargin)
 fmt = ' (%.3d)';
 filepathnotrepeat = filepath;
 i = 0;
-while isfile(filepathnotrepeat)
+while isfile(filepathnotrepeat) || isfolder(filepathnotrepeat)
     i = i+1;
     ind = regexp(filepath,'\.');
-    pt = ind(end);
+    try
+        pt = ind(end);
+    catch
+        pt = length(filepath) +1; % is folder
+    end
     filepathnotrepeat = [filepath(1:pt-1), sprintf(fmt,i),filepath(pt:end)];
 end
+
 
 end
 

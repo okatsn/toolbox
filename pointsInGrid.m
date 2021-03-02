@@ -3,7 +3,7 @@ function [M,gridX,gridY] = pointsInGrid(scatterX,scatterY,scalarC,gridX,gridY,M)
 % in each grid as N, and do M = N*scalarC + M. If there exists NaNs in
 % array M, a nan plus by a non-zero value v becomes v, not nan.
 if isempty(scatterX)
-    warning('Input X (1st argument) is empty. Return without any modification.');
+    warning('[pointsInGrid] Input X (1st argument) is empty. Return without any modification.');
     return
 end
 

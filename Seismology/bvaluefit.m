@@ -156,7 +156,7 @@ if numclusters > 1 && ~manually_split
     end
     
     clusteridx = kmeans(X,numclusters); 
-    splitpoint = find(diff(clusteridx)); 
+    splitpoint = find(diff(clusteridx)); % incorporate with 
     expected_n = numclusters-1;
     if length(splitpoint) > expected_n
     % ideally, clusteridx should be such as 1 1 1 2 2 2...

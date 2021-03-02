@@ -19,6 +19,16 @@ classdef goto
             cd(dir_x);
         end
         
+        function dir_x = inversion_WuLun()
+            root0 = RootFolder;
+            dir_x = fullfile(root0,'1Programming','MATLAB','InversionProblems','script');
+            % libDir = 'C:\Google THW\1MyResearch\MATLAB\InversionProblems\cd_5.3\Lib';
+            % scriptDir = fullfile(root_0,folderNm,'script');
+            % dataDir = fullfile(root_0,folderNm,'DATA');
+            % imgDir = fullfile(root_0,folderNm,'HomeworkMD');
+            cd(dir_x);
+        end
+        
         function dir_x = sde()
             root0 = RootFolder;
             dir_x = fullfile(root0,'1Programming','MATLAB','TEX_fit_SDE_gen');
