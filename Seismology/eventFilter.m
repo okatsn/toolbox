@@ -124,7 +124,6 @@ tmidx = tidx & midx;
 
 if ~isequal(Radius,0)
     ridx = false(height_tb,1); % false means to discard
-    Depth = catalog.Depth;
     LatLon2 = [catalog.Lat,catalog.Lon]; 
     % faster to copy a certain variable from table before entering for loop.
     if istable(Radius)
@@ -193,6 +192,7 @@ if ~isequal(Radius,0)
                     end
                 end
             case 1
+                Depth = catalog.Depth;
                 if any(Rc1>1000)
                     warning('Beware that distance is NOT calculated in 3D space, i.e. If Rc or Depth is very large, results deviate.');
                     % to get the real distance between the two points on
