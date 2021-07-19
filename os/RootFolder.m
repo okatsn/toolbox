@@ -21,6 +21,9 @@ end
 switch computer_name
     case 'DESKTOP-8Q9V6U2' 
         root0 = 'C:\Google THW';
+        nickname = 'PC in Lab (old)';
+    case 'DESKTOP-800FKD5'
+        root0 = 'D:\GoogleDrive';
         nickname = 'PC in Lab';
     case 'LAPTOP-H2N83MUU'
         root0 = 'D:\GoogleDrive';
