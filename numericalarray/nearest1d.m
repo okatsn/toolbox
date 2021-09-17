@@ -1,9 +1,11 @@
-function [nearest_idx_1,value_1,varargout] = nearest1d(array0,near_to)
+% `[nearest_idx_1,value_1,varargout] = nearest1d(array0,near_to)`
 % find the element in array0 which is nearest to 'near_to'.
 % 1st output: the index of the nearest element in array0.
 % 2nd output: the values of the nearest elements in array0.
 % value_1 = array0(nearest_idx_1);
 % e.g [idx,val] = nearest1d(randn(100,1),[0.1,2,0.9])
+function [nearest_idx_1,value_1,varargout] = nearest1d(array0,near_to)
+
 if isempty(near_to)
     nearest_idx_1 = [];%false(size(array0));
     value_1 = [];
