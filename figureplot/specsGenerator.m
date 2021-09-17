@@ -10,7 +10,7 @@ end
 
 numtypes = numvarin/2;
 varargout = cell(1,numtypes);
-all_markers = {'o';'+';'*';'.';'x';'s';'d';'^';'v';'>';'<';'p';'h'};
+all_markers = {'o';'s';'d';'^';'v';'>';'<';'p';'h';'+';'*';'.';'x'};
 all_linestyles = {'-'; '--'; ':'; '-.'};
 
 for i = 1:numtypes
