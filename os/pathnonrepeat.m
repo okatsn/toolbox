@@ -4,8 +4,7 @@ function [filepathnotrepeat] = pathnonrepeat(filepath,varargin)
 %     
 % How to use:
 %     filepath = 'C:\Google THW\1MyResearch\DATA\data.mat';
-%     fmt = ' (%.3d)';
-%     [filepathnotrepeat] = pathnonrepeat(filepath,fmt);
+%     [filepathnotrepeat] = pathnonrepeat(filepath);
 fmt = ' (%.3d)';
 filepathnotrepeat = filepath;
 i = 0;
