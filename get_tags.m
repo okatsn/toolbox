@@ -1,4 +1,3 @@
-function [O] = get_tags(inputchar, varargin)
 % inputchar = 'XXXX_trn[20190510].matXXXX_frc[20190808].mat';
 % Example 1:
 %     O = get_tags(inputstring,'Prefix',{'trn','frc'},'reshape',{'Row',pf_iters},'unique',1);
@@ -20,7 +19,7 @@ function [O] = get_tags(inputchar, varargin)
 % 
 % The following functions depend on this:
 %     statind(); % calculate daily statistics in MagTIP
-
+function [O] = get_tags(inputchar, varargin)
 
 default_expr = '(?<=%s\\[).+?(?=\\])';
 

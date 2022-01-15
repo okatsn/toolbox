@@ -34,7 +34,8 @@ switch computer_name
 %         warning('numcore is 16 but actually only 12 cores can be used in parfor.');
         nickname = 'Linux in NCU';
     otherwise
-        error('Error in specifying root folder. See RootFolder');
+        root0 = 'Unregistered machine. See RootFolder.m';
+        nickname = root0;
 end
 if do_print
     fprintf('%d cores available. This is %s\n',pf_iters,nickname);
