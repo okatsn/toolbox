@@ -17,7 +17,7 @@ cmd1 = sprintf('"%s" x -y "%s" -o"%s"', path7zip, zipfilepath, outputDir);
 
 
 if ~isequal(status, 0)
-    error("File extraction failed.")
+    error("%s", result);
 end
 
 end

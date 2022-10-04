@@ -22,8 +22,7 @@
 function [O] = get_tags(inputchar, varargin)
 
 default_expr = '(?<=%s\\[).+?(?=\\])';
-
-        match_expr_func = @(x) sprintf(default_expr,x);
+match_expr_func = @(x) sprintf(default_expr,x);
 % if nargin == 1 
 %     tags = regexp(inputchar,match_expr_func('[a-zA-Z]'),'match');
 %     for i = 1:length(tags)
