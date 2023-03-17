@@ -63,6 +63,7 @@ p = inputParser;
 addRequired(p, 'keyword');
 addRequired(p, 'targetfolder');
 addParameter(p, 'Search','default_search');
+addParameter(p, 'regexpPatternOnFile', '')
 % addParameter(p, 'Basic',0);
 addParameter(p,'SortBy',0);
 parse(p, keyword, targetfolder, varargin{:});
@@ -73,7 +74,7 @@ folderName = rslt.targetfolder;
 Search = rslt.Search;
 % Basic = rslt.Basic;
 SortBy = rslt.SortBy;
-
+rexpr = rslt.regexpPatternOnFile;
 
 tmp = regexp(Search, '(?<SearchIn>\**)(?<SearchOption>\w*)', 'names');
 
@@ -94,6 +95,7 @@ else % if input is the name of a subfolder
     target_path = fullfile(pwd, folderName);
 end
 
+%% Search in dir
 search_for = keyword; %e.g. '*.txt'
 dir_info = dir(fullfile(target_path, SearchIn, search_for)); % find all .txt in the folder and all subfolders.
 % For example, dir */*.txt lists all files with a txt extension exactly one folder under the current folder, 
@@ -112,7 +114,18 @@ switch SearchOption
         dir_info([dir_info.isdir]) = [];
 end
 
+%% Filter on file name with regexpPattern
+if ~isempty(rexpr)
+    % supports only after 2020b
+    idmatchname = contains({dir_info(:).name}, rexpr);
+    dir_info(~idmatchname) = [];
+end
+
+
+%% Create a table after filtering is completed
 num_content = numel(dir_info);
+
+
 
 % if isequal(Basic,0) % full
     varNames = {'path', 'file','fullpath','name','date','datenum','relativepath'};
