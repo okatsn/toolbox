@@ -1,3 +1,6 @@
+% `[total_seconds] = HMS2S(datevec)` converts a matrix N by 6 `datevec` to
+% a N by 1 array of double, being the values in the unit of second.
+% The six columns of `datevec` should be in the order of year, month, day, hour, minute and second.
 function [total_seconds] = HMS2S(datevec)
 % Convert N by 3, [hours, Minutes, seconds] to seconds.
 numRows = size(datevec,1);
