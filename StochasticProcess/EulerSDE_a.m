@@ -159,9 +159,9 @@ end
 if smooth~=0
 %     smth_to = regexp(smooth,'(pt|sec)','match');
 %     smooth_parameter = regexp(smooth,'\d+\.?\d*e?[+-]?\d*\.?\d*(?=(pt|sec))','match');
-% '\d+\.?\d*': ¼Æ¦r(¦Ü¤Ö1) ¤p¼ÆÂI(1©Î0¦¸) ¼Æ¦r(0¦ÜµL­­¦ì) 
-% 'e?[+-]?\d*\.?\d*': ¦r¥Àe(1©Î0¦¸) (¦r²Å¶°)[+©Î-](1©Î0¦¸) ¼Æ¦r(0¦ÜµL­­¦¸) ¤p¼ÆÂI(1©Î0¦¸) ¼Æ¦r(0¦ÜµL­­¦ì) 
-% '(?=(pt|sec))': «á­±­n±µµÛpt©Îsec¤~·|¤Ç°t¨ì
+% '\d+\.?\d*': ï¿½Æ¦r(ï¿½Ü¤ï¿½1) ï¿½pï¿½ï¿½ï¿½I(1ï¿½ï¿½0ï¿½ï¿½) ï¿½Æ¦r(0ï¿½ÜµLï¿½ï¿½ï¿½ï¿½) 
+% 'e?[+-]?\d*\.?\d*': ï¿½rï¿½ï¿½e(1ï¿½ï¿½0ï¿½ï¿½) (ï¿½rï¿½Å¶ï¿½)[+ï¿½ï¿½-](1ï¿½ï¿½0ï¿½ï¿½) ï¿½Æ¦r(0ï¿½ÜµLï¿½ï¿½ï¿½ï¿½) ï¿½pï¿½ï¿½ï¿½I(1ï¿½ï¿½0ï¿½ï¿½) ï¿½Æ¦r(0ï¿½ÜµLï¿½ï¿½ï¿½ï¿½) 
+% '(?=(pt|sec))': ï¿½á­±ï¿½nï¿½ï¿½ï¿½ï¿½ptï¿½ï¿½secï¿½~ï¿½|ï¿½Ç°tï¿½ï¿½
      Sm = regexp(smooth,'(?<sp_>\d*\.?\d*e?[+-]?\d+\.?\d*)(?<st_>pt|sec)','names');
      smooth_parameter = Sm.sp_;
      smth_to = Sm.st_;
@@ -173,7 +173,7 @@ if smooth~=0
         case 'pt' % smooth to total m point
             m = smooth_parameter;
             tmp = totalTime/m/dt;
-            steps=round(tmp); %Euler method¶]n¨B(¦@N+1µ§¸ê®Æ¡A²Ä¤@µ§¬°ªì©l±ø¥ó)
+            steps=round(tmp); %Euler methodï¿½]nï¿½B(ï¿½@N+1ï¿½ï¿½ï¿½ï¿½Æ¡Aï¿½Ä¤@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½)
             Nw=steps+1;% points in each window
 %             assignin('base','Nw',Nw); % DEBUG
 %             assignin('base','m',m); % DEBUG
@@ -182,7 +182,7 @@ if smooth~=0
         case 'sec' % smooth window (in seconds) = smooth_parameter
             tmp = totalTime/smooth_parameter;
             m = round(tmp); % total m point
-            steps=round(smooth_parameter/dt); %Euler method¶]n¨B(¦@N+1µ§¸ê®Æ¡A²Ä¤@µ§¬°ªì©l±ø¥ó)
+            steps=round(smooth_parameter/dt); %Euler methodï¿½]nï¿½B(ï¿½@N+1ï¿½ï¿½ï¿½ï¿½Æ¡Aï¿½Ä¤@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½)
             Nw=steps+1; % points in each window
             T_smth = NaN(m,1); Y_smth = NaN(m,1);
             smooth_info = sprintf('smooth window = %d %s',smooth_parameter,smth_to);
@@ -196,7 +196,7 @@ else % not smooth
         m = 1;
         steps=round(totalTime/dt); 
     end
-    Nw=steps+1;%Euler method¶]n¨B(¦@n+1µ§¸ê®Æ¡A²Ä¤@µ§¬°ªì©l±ø¥ó)
+    Nw=steps+1;%Euler methodï¿½]nï¿½B(ï¿½@n+1ï¿½ï¿½ï¿½ï¿½Æ¡Aï¿½Ä¤@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½ï¿½ï¿½)
     
     smooth_info = 'original';
 end
@@ -216,7 +216,7 @@ if isstruct(results.seed)
    rng(results.seed); %if structure then use the input seed (e.g. 'seed',O.seed)
    O.seed = results.seed;
 else
-   O.seed=rng;%Àx¦sÀH¾÷ÅÜ¼ÆªººØ¤l¡A¥H«K»Ý­n®É¯à­«²{¡C
+   O.seed=rng;%ï¿½xï¿½sï¿½Hï¿½ï¿½ï¿½Ü¼Æªï¿½ï¿½Ø¤lï¿½Aï¿½Hï¿½Kï¿½Ý­nï¿½É¯à­«ï¿½{ï¿½C
 end
 
 
@@ -226,14 +226,17 @@ switch FrictionType
     case {'wet','viscous'}
         drift = @(x) -r*x;
         Y_avg_predicted = sqrt(2*D/(pi*r));
+        use_prox_step = false;
     case {'dry','Coulomb'}
         drift = @(x) -r*sign(x);
         Y_avg_predicted = D/r;
+        use_prox_step = true;  % Use prox step for dry friction
     case {'mixture','general'}
         if numel(r) ==2
             r1 = r(1);
             r2 = r(2);
             drift = @(x) -r1*x-r2*sign(x);
+            use_prox_step = true;  % Use prox step for mixed friction (has sign term)
         else
             errorStruct.message = 'if friction type is mixture, r have to be 1 by 2 double, the 1st one is viscous; 2nd one is for dry. For example, r = [1,3]';
             error(errorStruct)
@@ -248,14 +251,33 @@ end
 
 % if isequal(SaveInplace,0)
 for k=1:m
-    dW=sigma.*randn(1,steps)+mm;%¥­§¡­È¬°¹s%¤@¦¸²£¥Ín­ÓÀH¾÷ÅÜ¼Æ(1¦Cn¦æ)¡CNw=steps+1;
+    dW=sigma.*randn(1,steps)+mm;%ï¿½ï¿½ï¿½ï¿½ï¿½È¬ï¿½ï¿½s%ï¿½@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½Hï¿½ï¿½ï¿½Ü¼ï¿½(1ï¿½Cnï¿½ï¿½)ï¿½CNw=steps+1;
 %     dWm{k} = dW; % for debug use.
     traceT=NaN(Nw,1); traceY=NaN(Nw,1);
     traceT(1)=t;    traceY(1)=y;%initial condition
         for i=2:Nw
-            t=t+dt;   
-            y=y+drift(y)*dt+b*dW(i-1) + Fext_x_dt;           
-            traceT(i)=t;  
+            t=t+dt;
+
+            if use_prox_step
+                % Prox/soft-threshold update for dry friction to handle discontinuous drift correctly
+                % This avoids the local-time bias of naive Euler-Maruyama on sign(y)
+                if strcmp(FrictionType, 'dry') || strcmp(FrictionType, 'Coulomb')
+                    % For pure dry friction: dv = -F_C*sign(v)*dt + F_ext*dt + sqrt(2D)*dW
+                    % Prox step: z = y + F_ext*dt + noise, then y_new = sign(z)*max(|z| - F_C*dt, 0)
+                    z = y + Fext_x_dt + b*dW(i-1);
+                    y = sign(z) * max(abs(z) - r*dt, 0);
+                elseif strcmp(FrictionType, 'mixture') || strcmp(FrictionType, 'general')
+                    % For mixed friction: dv = -r1*v*dt - r2*sign(v)*dt + F_ext*dt + sqrt(2D)*dW
+                    % Prox step: first apply viscous term, then soft-threshold for dry component
+                    z = y + (-r1*y)*dt + Fext_x_dt + b*dW(i-1);
+                    y = sign(z) * max(abs(z) - r2*dt, 0);
+                end
+            else
+                % Standard Euler step for viscous friction
+                y = y + drift(y)*dt + b*dW(i-1) + Fext_x_dt;
+            end
+
+            traceT(i)=t;
             traceY(i)=y; %
         end
 
@@ -296,7 +318,7 @@ if TimeElapseTR
     delete(H.waitbarHandle);
 end
 % else
-%     dW=sigma.*randn(1,steps)+mm;%¥­§¡­È¬°¹s%¤@¦¸²£¥Ín­ÓÀH¾÷ÅÜ¼Æ(1¦Cn¦æ)¡CNw=steps+1;
+%     dW=sigma.*randn(1,steps)+mm;%ï¿½ï¿½ï¿½ï¿½ï¿½È¬ï¿½ï¿½s%ï¿½@ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½Hï¿½ï¿½ï¿½Ü¼ï¿½(1ï¿½Cnï¿½ï¿½)ï¿½CNw=steps+1;
 %     traceT=NaN(1,Nw); traceY=NaN(1,Nw);
 %     traceT(1)=t;    traceY(1)=y;
 %         for i=2:Nw
@@ -327,7 +349,7 @@ end
 if showInfo~=0
     O.std_Y = std(O.Y);
     O.mean_Y = mean(O.Y);
-    O.varianceOfdW=var(dW);%À³¸Ó­nµ¥©ódt
+    O.varianceOfdW=var(dW);%ï¿½ï¿½ï¿½Ó­nï¿½ï¿½ï¿½ï¿½dt
     O.meanOfdW=mean(dW);
     O.steps=Nw*m-1;
     O.Gamma = (b/dt)*dW; % output fluctuating force Gamma(t)
@@ -355,7 +377,7 @@ O.ConstantForce_x_dt = Fext_x_dt;
       ax=gca;  ax.YGrid='on';
   
         pos_x=0; superTitle =sprintf('D=%.2f; \\gamma=%.2f; frictionType: %s',D,r,FrictionType);
-        other.FontSize = 18;  %¡ö ³]©w³o¸Ì
+        other.FontSize = 18;  %ï¿½ï¿½ ï¿½]ï¿½wï¿½oï¿½ï¿½
         pos_y=0.91;  pos = [pos_x pos_y 1-pos_x 1-pos_y] ; %[x_start y_start width height] of textbox.
         other.HorizontalAlignment = 'center'; other.VerticalAlignment = 'bottom';
         annote(superTitle,pos,f1,other);
@@ -411,12 +433,12 @@ end
 function annote(text,pos,fig,other)
 dim = pos;  
 a=annotation(fig,'textbox',dim,'String','');
-%«Ø¥ßannotation®É¥²©w­n¥ý³]©wcontanier(¥i¥H¬O¤è§Î¡B¾ò¶ê¡B½bÀY)ªº¤j¤p©M¥Lªº¹ïÀ³¤å¦r
+%ï¿½Ø¥ï¿½annotationï¿½É¥ï¿½ï¿½wï¿½nï¿½ï¿½ï¿½]ï¿½wcontanier(ï¿½iï¿½Hï¿½Oï¿½ï¿½Î¡Bï¿½ï¿½ï¿½Bï¿½bï¿½Y)ï¿½ï¿½ï¿½jï¿½pï¿½Mï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½r
 a.String = text;
-a.LineStyle='none';%³]©w¨S¦³¥~®Ø
+a.LineStyle='none';%ï¿½]ï¿½wï¿½Sï¿½ï¿½ï¿½~ï¿½ï¿½
 
     if isfield(other,'HorizontalAlignment') % 'left' (default) | 'center' | 'right'
-        %Alignment ¬O«ü ¤å¦r¹ï»ô©ótextboxªº'¥ª'¡B'¤¤'©Î'¥k'°¼
+        %Alignment ï¿½Oï¿½ï¿½ ï¿½ï¿½rï¿½ï¿½ï¿½ï¿½ï¿½textboxï¿½ï¿½'ï¿½ï¿½'ï¿½B'ï¿½ï¿½'ï¿½ï¿½'ï¿½k'ï¿½ï¿½
        a.HorizontalAlignment = other.HorizontalAlignment;
     end
     
