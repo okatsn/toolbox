@@ -12,8 +12,11 @@ function [f,P1,P2] = lazy_fft(X,t0,varargin)
 % Plot:
 %     plot(f,P2(1:n/2+1));% Plot the unique frequencies. see doc fft.
 %     plot(f,P1);
-% Bug to fix: 1:n/2+1 will cause 
+% Bug to fix: 1:n/2+1 will cause
 %             Warning: Integer operands are required for colon operator when used as index
+
+% Demean to remove DC spike/leakage (important when mean(X) ~= 0)
+X = X - mean(X);
 
 fft_input = {X};
 if length(t0)>1 % then t0 is the timeseries
@@ -25,7 +28,7 @@ if length(t0)>1 % then t0 is the timeseries
     else % Y = lazy_fft(X,t);
         n = L;
     end
-    
+
 else % if length(t0) == 1, then t0 should be the samping period, dt.
     dt = t0;
     L = varargin{1}; % if 2nd argument is sampling period (T), then signal length L is required.
@@ -49,19 +52,21 @@ end
 Y = fft(fft_input{:});
 P2 = abs(Y/L); % two-sided spectrum
 
-% Compute the single-sided spectrum P1 based on P2 and the even-valued signal length L.
-P1 = P2(1:n/2+1); % P1 = P2(1:L/2+1);
-% Warning will be raised since n/2 may not be an interger; however, it
-% seems ok. (Warning: Integer operands are required for colon operator when used as index. )
+% Compute the single-sided spectrum P1 based on P2 and the signal length.
+% Use floor(n/2) to avoid non-integer indexing warnings when n is odd.
+nhalf = floor(n/2);
+P1 = P2(1:nhalf+1); % P1 = P2(1:L/2+1);
 
-P1(2:end-1) = 2*P1(2:end-1); % Single-Sided Amplitude Spectrum of X(t)
+if numel(P1) > 2
+    P1(2:end-1) = 2*P1(2:end-1); % Single-Sided Amplitude Spectrum of X(t)
+end
 
 % Define the frequency domain f
-f = Fs*(0:(n/2))/n; % f = Fs*(0:(L/2))/L;
-% because the indices of P1 is 1:(n/2+1), 
+f = Fs*(0:nhalf)/n; % f = Fs*(0:(L/2))/L;
+% because the indices of P1 is 1:(n/2+1),
 % hence f = 0:(n/2) has the same number of elements of P1.
 % On the other hand, to plot P1(1:n/2), the correct size of f is 0:(n/2-1).
-% Just making a note, 0:(Fs/n):(Fs/2-Fs/n) in the documents of fft 
+% Just making a note, 0:(Fs/n):(Fs/2-Fs/n) in the documents of fft
 % is identical to Fs*(0:(n/2-1))/n.
 end
 
