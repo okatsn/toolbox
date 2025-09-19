@@ -11,6 +11,13 @@ classdef omega2
             %    (Ide 2019) Two-Dimensional Probabilistic Cell Automaton
             %    Model for Broadband Slow Earthquakes
         end
+        function model_Ide = Ide2019Eq4_ASD3c()
+            model_Ide = @(c,f) c(1)./( sqrt(1+(f/c(2)).^2)) + c(3);
+            % Ide 2019 Eq.4 (with `c = [plateau, fc, white-floor]`)
+            % Best guess for the white floor: `c(3) ≥ 0` and `c(3) ≤ min(P1(f>0))`
+            %    (Ide 2019) Two-Dimensional Probabilistic Cell Automaton
+            %    Model for Broadband Slow Earthquakes
+        end
         function model_Aki = Aki1967Eq30()
             model_Aki = @(c,f) c(1)./( 1+(f/c(2)).^2 );
             % Lay, Eq. 10.38, p.515; Aki, 1967 Eq.30
